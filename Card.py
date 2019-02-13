@@ -1,26 +1,17 @@
 from Board import Board
+from Cell import *
+from utils import *
 
 class Card(object):
 
-    '''Sample class for initial commit'''
+    def __int__(self,rotation, xcoordinate, ycoordinate):
+        self.rotation = rotation
+        self.first_cell = Cell(rotation[1] ,rotation[2],xcoordinate,ycoordinate)
+        self.second_cell = get_second_cell(rotation, xcoordinate, ycoordinate)
 
-    DOT = ['BLACK','WHITE']
+    def get_first_cell(self):
+        return self.first_cell
 
-    COLOR = ['RED','WHITE']
+    def get_second_cell(self):
+        return self.second_cell
 
-    DIRECTION = ['HORIZONTAL' , 'VERTICAL']
-
-    ROTATIONS = [[DIRECTION[0],DOT[0],COLOR[0],DOT[1],COLOR[1]],
-                 [DIRECTION[1],DOT[0],COLOR[0],DOT[1],COLOR[1]],
-                 [DIRECTION[0],DOT[1],COLOR[1],DOT[0],COLOR[0]],
-                 [DIRECTION[1],DOT[1],COLOR[1],DOT[0],COLOR[0]],
-                 [DIRECTION[0],DOT[1],COLOR[0],DOT[0],COLOR[1]],
-                 [DIRECTION[1],DOT[1],COLOR[0],DOT[0],COLOR[1]],
-                 [DIRECTION[0],DOT[0],COLOR[1],DOT[1],COLOR[0]],
-                 [DIRECTION[1],DOT[0],COLOR[1],DOT[1],COLOR[0]]]
-
-    # board = Board()
-    # board.place_card(ROTATIONS[0], 0, 1)
-    # c = board.get_cell_info(0,1)
-    # print(c.get_dot_type())
-    # print(board.matrix_data)
