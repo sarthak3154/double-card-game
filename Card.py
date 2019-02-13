@@ -15,3 +15,5 @@ class Card:
     def get_second_cell(self):
         return self.second_cell
 
+    def get_rotation(self):
+        return self.rotation

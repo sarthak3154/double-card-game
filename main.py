@@ -50,5 +50,3 @@ if playMode == 1:
         perform_player_move(nextPlayer(), board)
         print(board.matrix_data)
         isGameEnded = 1
-
-
