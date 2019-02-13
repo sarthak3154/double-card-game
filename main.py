@@ -29,7 +29,7 @@ def select_play_mode():
 
 def perform_player_move(player, board):
     print('\nPlayer {0}, Your turn now...'.format(str(player + 1)))
-    move = input('Play your move: ')
+    move = input('Play your move: \n')
     moveInfo = move.split(' ')
     card = Card(ROTATIONS[int(moveInfo[1]) - 1],getXCoordinate(moveInfo[2]),getYCoordinate(moveInfo[3]))
     board.place_card(card)
@@ -48,8 +48,7 @@ if playMode == 1:
     isGameEnded = 0
     while isGameEnded is 0:
         perform_player_move(nextPlayer(), board)
+        print(board.matrix_data)
         isGameEnded = 1
 
-    c = board.get_cell_info(0, 0)
-    print(c.get_dot_type())
-    print(board.matrix_data)
+
