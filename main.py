@@ -4,8 +4,8 @@ from Board import *
 from Card import *
 from Cell import *
 
-DOT = ['BLACK','WHITE']
-COLOR = ['RED','WHITE']
+DOT = ['BLACK_DOT','WHITE_DOT']
+COLOR = ['RED_COLOR','WHITE_COLOR']
 DIRECTION = ['HORIZONTAL' , 'VERTICAL']
 ROTATIONS = [[DIRECTION[0],DOT[0],COLOR[0],DOT[1],COLOR[1]],
              [DIRECTION[1],DOT[1],COLOR[1],DOT[0],COLOR[0]],
@@ -40,6 +40,7 @@ def nextPlayer():
     n+=1
     return n % NUM_PLAYERS
 
+
 playMode = select_play_mode()
 
 if playMode == 1:
@@ -50,5 +51,3 @@ if playMode == 1:
         perform_player_move(nextPlayer(), board)
         print(board.matrix_data)
         isGameEnded = 1
-
-
