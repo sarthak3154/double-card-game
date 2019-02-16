@@ -8,7 +8,7 @@ class Board:
         self.matrix_data = np.empty((12, 8), dtype=object)
         self.players = players
         self.cards = {}
-        self.placed_cards_count = 20
+        self.placed_cards_count = 0
         self.last_card_placed = None
         self.current_player = None
         self.is_winner_found = False
