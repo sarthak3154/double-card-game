@@ -7,6 +7,7 @@ class Board:
         self.matrix_data = np.empty((8, 12), dtype=object)
         self.players = players
         self.placed_cards_count = 0
+        self.last_card_placed = None
         self.winner = None
 
     def place_card(self, card):
@@ -19,10 +20,11 @@ class Board:
             self.matrix_data[x1][y1] = card.get_first_cell()
             self.matrix_data[x2][y2] = card.get_second_cell()
             self.placed_cards_count += 1
+            self.last_card_placed = card
             self.check_win(x1, y1, "DOT")
             return True
         else:
-            print('Invalid Move! Please input a valid position')
+            print('Invalid Move! Please input a valid move')
             return False
 
     def get_cell_info(self,x,y):
@@ -70,6 +72,9 @@ class Board:
         y1 = first_cell.get_y_coordinate()
         x2 = second_cell.get_x_coordinate()
         y2 = second_cell.get_y_coordinate()
+        if self.is_recycler_move_legal(x1, y1, x2, y2) == False:
+            print('Illegal Move. Cannot pick the card last chosen by another player')
+            return False
         move_success = self.place_card(final_card)
         if move_success:
             self.matrix_data[x1][y1] = None
@@ -86,7 +91,16 @@ class Board:
 
     def is_move_legal(self, x1, y1, x2, y2):
         if y1 > 0 and (self.matrix_data[x1][y1-1] == None or self.matrix_data[x2][y1-1] == None):
-                return False
+            return False
         if x1 < 0 or x1 >= 7 or y1 < 0 or y2 >= 12:
             return False
         return True
+
+    def is_recycler_move_legal(self, x1, y1, x2, y2):
+        last_card_x1 = self.last_card_placed.get_first_cell().get_x_coordinate()
+        last_card_y1 = self.last_card_placed.get_first_cell().get_y_coordinate()
+        last_card_x2 = self.last_card_placed.get_second_cell().get_x_coordinate()
+        last_card_y2 = self.last_card_placed.get_second_cell().get_y_coordinate()
+        if last_card_x1 != x1 or last_card_y1 != y1 or last_card_x2 != x2 or last_card_y2 != y2:
+            return True
+        return False

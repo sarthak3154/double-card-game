@@ -22,7 +22,7 @@ NUM_PLAYERS = 2
 
 def select_play_mode():
     mode = input('\nSelect from the Play Modes: \n1. Human v Human\n2. Human v AI\n')
-    if len(mode) > 1:
+    if len(mode) > 1 or (mode.isnumeric() and (int(mode) > 2 or int(mode) < 1)):
         print('Invalid Input! Choose from the default Play Modes.')
         return select_play_mode()
 
@@ -50,6 +50,9 @@ def perform_player_recycling_move(board):
     moveInfo = move.split(' ')
     first_cell = board.get_cell_info(getXCoordinate(moveInfo[0]), getYCoordinate(moveInfo[1]))
     second_cell = board.get_cell_info(getXCoordinate(moveInfo[2]), getYCoordinate(moveInfo[3]))
+    if is_valid_card_input([first_cell, second_cell]) == False:
+        print('Invalid Input Card. Please input a valid card to be moved')
+        return perform_player_recycling_move(board)
     final_card = Card(ROTATIONS[int(moveInfo[4]) - 1], getXCoordinate(moveInfo[5]), getYCoordinate(moveInfo[6]))
     move_success = board.move_card(first_cell, second_cell, final_card)
     if move_success == False:
@@ -73,7 +76,7 @@ if playMode == 1:
         print('\nPlayer {0}, Your turn now...'.format(str(nextPlayer() + 1)))
         perform_player_regular_move(board)
 
-    while board.get_winner() == None:
+    while board.get_winner() == None and board.get_placed_cards_count() < 60:
         print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(nextPlayer() + 1)))
         perform_player_recycling_move(board)
 
