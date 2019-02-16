@@ -73,7 +73,7 @@ def print_board(board):
             if board.matrix_data[i][j] != None:
                 dot_type = board.matrix_data[i][j].get_dot_type()
                 color_type = board.matrix_data[i][j].get_color_type()
-                print_matrix[i][j] =  ('RC' if color_type == COLOR[0] else 'WC') +\
+                print_matrix[i][j] = ('RC' if color_type == COLOR[0] else 'WC') +\
                                  ('*' if dot_type == DOT[0] else 'o')
 
     print(tabulate(print_matrix, headers, tablefmt="fancy_grid"))
@@ -83,6 +83,7 @@ def nextPlayer():
     global n
     n+=1
     return n % NUM_PLAYERS
+
 
 playMode = select_play_mode()
 
@@ -110,3 +111,15 @@ if playMode == 1:
         print(board.get_current_player())
     else:
         print('Game draw!')
+
+
+# def print_data(x,y):
+#     data = np.array([[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8]])
+#     # diagonal1 = np.diagonal(data, y - x)
+#     # diagonal2 = np.diagonal(np.fliplr(data), y - x)
+#     print(data)
+#     print(np.size(data,1))
+#     print(np.diagonal(np.fliplr(data),(y-np.size(data,1) + 1)-x))
+#
+# print_data(2,8)
+

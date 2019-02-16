@@ -39,8 +39,8 @@ class Board:
                     "WHITE_COLOR WHITE_COLOR WHITE_COLOR WHITE_COLOR"]
         current_row = self.matrix_data[:,y]
         current_column = self.matrix_data[x,:]
-        diagonal1 = np.diagonal(self.matrix_data)
-        diagonal2 = np.diagonal(np.fliplr(self.matrix_data))
+        diagonal1 = np.diagonal(self.matrix_data,y-x)
+        diagonal2 = np.diagonal(np.fliplr(self.matrix_data),(y-np.size(self.matrix_data,1)+1)-x)
 
         if symbol == 'DOTS' and (patterns[0] in self.get_data_string(current_row,symbol) or \
                                   patterns[1] in self.get_data_string(current_row,symbol) or \
