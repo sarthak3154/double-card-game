@@ -6,7 +6,7 @@ class Board:
     def __init__(self, players):
         self.matrix_data = np.empty((12, 8), dtype=object)
         self.players = players
-        self.placed_cards_count = 0
+        self.placed_cards_count = 20
         self.last_card_placed = None
         self.current_player = None
         self.is_winner_found = False
@@ -40,7 +40,7 @@ class Board:
         current_row = self.matrix_data[:,y]
         current_column = self.matrix_data[x,:]
         diagonal1 = np.diagonal(self.matrix_data,y-x)
-        diagonal2 = np.diagonal(np.fliplr(self.matrix_data),(y-np.size(self.matrix_data,1)+1)-x)
+        diagonal2 = np.diagonal(np.fliplr(self.matrix_data), np.size(self.matrix_data,1) - 1 - y - x)
 
         if symbol == 'DOTS' and (patterns[0] in self.get_data_string(current_row,symbol) or \
                                   patterns[1] in self.get_data_string(current_row,symbol) or \
@@ -98,9 +98,9 @@ class Board:
         return self.current_player.get_play_choice() + " player won"
 
     def is_move_legal(self, x1, y1, x2, y2):
-        if self.matrix_data[x1][y1] != None or self.matrix_data[x2][y2] != None:
+        if self.matrix_data[x1][y1] is not None or self.matrix_data[x2][y2] is not None:
             return False
-        if x1 > 0 and (self.matrix_data[x1-1][y1] == None or (y1 != y2 and self.matrix_data[x1-1][y2] == None)):
+        if x1 > 0 and (self.matrix_data[x1-1][y1] is None or (y1 != y2 and self.matrix_data[x1-1][y2] is None)):
             return False
         if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:
             return False

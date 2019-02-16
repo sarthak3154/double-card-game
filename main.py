@@ -76,7 +76,7 @@ def print_board(board):
                 print_matrix[i][j] = ('RC' if color_type == COLOR[0] else 'WC') +\
                                  ('*' if dot_type == DOT[0] else 'o')
 
-    print(tabulate(print_matrix, headers, tablefmt="fancy_grid"))
+    print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
 
 n = -1
 def nextPlayer():
@@ -106,6 +106,7 @@ if playMode == 1:
         print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(current_player + 1)))
         board.set_current_player(players[current_player])
         perform_player_recycling_move(board)
+        print_board(board)
 
     if board.is_winner_found is True:
         print(board.get_current_player())
