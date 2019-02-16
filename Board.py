@@ -6,6 +6,7 @@ class Board:
     def __init__(self, players):
         self.matrix_data = np.empty((12, 8), dtype=object)
         self.players = players
+        self.cards = {}
         self.placed_cards_count = 20
         self.last_card_placed = None
         self.current_player = None
@@ -22,6 +23,8 @@ class Board:
             self.matrix_data[x2][y2] = card.get_second_cell()
             self.placed_cards_count += 1
             self.last_card_placed = card
+            self.cards[(x1, y1)] = (x2, y2)
+            self.cards[(x2, y2)] = (x1, y1)
             self.is_winner_found = self.check_win(x1, y1, self.current_player.get_play_choice()) or \
                 self.check_win(x2, y2, self.current_player.get_play_choice())
             return True
@@ -75,12 +78,13 @@ class Board:
         x2 = second_cell.get_x_coordinate()
         y2 = second_cell.get_y_coordinate()
         if self.is_recycler_move_legal(x1, y1, x2, y2) is False:
-            print('Illegal Move. Cannot pick the card last chosen by another player')
             return False
         move_success = self.place_card(final_card)
         if move_success:
             self.matrix_data[x1][y1] = None
             self.matrix_data[x2][y2] = None
+            del self.cards[(x1, y1)]
+            del self.cards[(x2, y2)]
             return True
         else:
             return False
@@ -111,6 +115,16 @@ class Board:
         last_card_y1 = self.last_card_placed.get_first_cell().get_y_coordinate()
         last_card_x2 = self.last_card_placed.get_second_cell().get_x_coordinate()
         last_card_y2 = self.last_card_placed.get_second_cell().get_y_coordinate()
+        if self.cards.get((x1, y1)) == None or self.cards.get((x2, y2)) == None or self.cards[(x1, y1)] != (x2, y2) or self.cards[(x2, y2)] != (x1, y1):
+            print('Illegal Move. This is not a card placed at the board')
+            return False
+
+        if (x1 == x2 and (self.get_cell_info(x1 + 1, y1) != None or self.get_cell_info(x1 + 1, y2) != None)) or self.get_cell_info(x2 + 1, y1) != None:
+            print('Illegal Move. Cannot pick this card. Pick any card from the top')
+            return False
+
         if last_card_x1 != x1 or last_card_y1 != y1 or last_card_x2 != x2 or last_card_y2 != y2:
             return True
+            
+        print('Illegal Move. Cannot pick this card last chosen by another player')
         return False
