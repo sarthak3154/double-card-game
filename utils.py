@@ -13,9 +13,9 @@ def getYCoordinate(yCellPosition):
 
 def get_second_cell(rotation,x,y):
     if rotation[0] == "HORIZONTAL":
-        return Cell(rotation[1],rotation[2],x+1,y)
+        return Cell(rotation[3],rotation[4],x+1,y)
     else:
-        return Cell(rotation[1],rotation[2],x,y+1)
+        return Cell(rotation[3],rotation[4],x,y+1)
 
 def is_valid_card_input(cells):
     if cells[0] == None or cells[1] == None:

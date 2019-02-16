@@ -4,7 +4,7 @@ from Cell import *
 class Board:
 
     def __init__(self, players):
-        self.matrix_data = np.empty((8, 12), dtype=object)
+        self.matrix_data = np.empty((12, 8), dtype=object)
         self.players = players
         self.placed_cards_count = 0
         self.last_card_placed = None
@@ -73,7 +73,7 @@ class Board:
         y1 = first_cell.get_y_coordinate()
         x2 = second_cell.get_x_coordinate()
         y2 = second_cell.get_y_coordinate()
-        if self.is_recycler_move_legal(x1, y1, x2, y2) == False:
+        if self.is_recycler_move_legal(x1, y1, x2, y2) is False:
             print('Illegal Move. Cannot pick the card last chosen by another player')
             return False
         move_success = self.place_card(final_card)

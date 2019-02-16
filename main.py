@@ -1,4 +1,7 @@
 import os
+from tabulate import tabulate
+from colored import fg, bg, attr
+import numpy as np
 from utils import *
 from Board import *
 from Card import *
@@ -50,7 +53,7 @@ def perform_player_recycling_move(board):
     moveInfo = move.split(' ')
     first_cell = board.get_cell_info(getXCoordinate(moveInfo[0]), getYCoordinate(moveInfo[1]))
     second_cell = board.get_cell_info(getXCoordinate(moveInfo[2]), getYCoordinate(moveInfo[3]))
-    if is_valid_card_input([first_cell, second_cell]) == False:
+    if is_valid_card_input([first_cell, second_cell]) is False:
         print('Invalid Input Card. Please input a valid card to be moved')
         return perform_player_recycling_move(board)
     final_card = Card(ROTATIONS[int(moveInfo[4]) - 1], getXCoordinate(moveInfo[5]), getYCoordinate(moveInfo[6]))
@@ -59,12 +62,26 @@ def perform_player_recycling_move(board):
         return perform_player_recycling_move(board)
     return True
 
+dt = np.dtype('U10')
+print_matrix = np.empty((12, 8), dtype=dt)
+def print_board(board):
+    # iteate over rows
+    for i in range(np.size(board.matrix_data, 0)):
+        # iterate over colums
+        for j in range(np.size(board.matrix_data, 1)):
+            if board.matrix_data[i][j] != None:
+                dot_type = board.matrix_data[i][j].get_dot_type()
+                color_type = board.matrix_data[i][j].get_color_type()
+                print_matrix[i][j] =  ('RC' if color_type == COLOR[0] else 'WC') +\
+                                 ('*' if dot_type == DOT[0] else 'o')
+
+    print(tabulate(print_matrix, headers, tablefmt="fancy_grid"))
+
 n = -1
 def nextPlayer():
     global n
     n+=1
     return n % NUM_PLAYERS
-
 
 playMode = select_play_mode()
 
@@ -72,18 +89,23 @@ if playMode == 1:
     print('\nYou have chosen to play in Manual Mode!')
     players = assign_player_choices()
     board = Board(players)
-    while board.get_placed_cards_count() < 24 and board.is_winner_found() == False:
+    headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
+    print_board(board)
+
+    while board.get_placed_cards_count() < 24 and board.is_winner_found is False:
         current_player = nextPlayer()
         print('\nPlayer {0}, Your turn now...'.format(str(current_player + 1)))
         board.set_current_player(players[current_player])
         perform_player_regular_move(board)
+        print_board(board)
 
-    while board.is_winner_found() == False and board.get_placed_cards_count() < 60:
-        current_player = nextPlayer() + 1
-        print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(current_player)))
+    while board.is_winner_found is False and board.get_placed_cards_count() < 60:
+        current_player = nextPlayer()
+        print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(current_player + 1)))
+        board.set_current_player(players[current_player])
         perform_player_recycling_move(board)
 
-    if board.is_winner_found() is True:
+    if board.is_winner_found is True:
         print(board.get_current_player())
     else:
         print('Game draw!')
