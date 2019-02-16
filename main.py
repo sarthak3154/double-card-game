@@ -63,9 +63,11 @@ def perform_player_recycling_move(board):
         return perform_player_recycling_move(board)
     return True
 
+
 dt = np.dtype('U10')
-print_matrix = np.empty((12, 8), dtype=dt)
+
 def print_board(board):
+    print_matrix = np.empty((12, 8), dtype=dt)
     # iteate over rows
     for i in range(np.size(board.matrix_data, 0)):
         # iterate over colums
