@@ -22,7 +22,8 @@ class Board:
             self.matrix_data[x2][y2] = card.get_second_cell()
             self.placed_cards_count += 1
             self.last_card_placed = card
-            self.is_winner_found = self.check_win(x1, y1, self.current_player.get_play_choice())
+            self.is_winner_found = self.check_win(x1, y1, self.current_player.get_play_choice()) or \
+                self.check_win(x2, y2, self.current_player.get_play_choice())
             return True
         else:
             print('Invalid Move! Please input a valid move')
@@ -41,7 +42,7 @@ class Board:
         diagonal1 = np.diagonal(self.matrix_data)
         diagonal2 = np.diagonal(np.fliplr(self.matrix_data))
 
-        if symbol == 'COLOR' and (patterns[0] in self.get_data_string(current_row,symbol) or \
+        if symbol == 'DOTS' and (patterns[0] in self.get_data_string(current_row,symbol) or \
                                   patterns[1] in self.get_data_string(current_row,symbol) or \
                                   patterns[0] in self.get_data_string(current_column,symbol) or \
                                   patterns[1] in self.get_data_string(current_column,symbol) or \
@@ -50,7 +51,7 @@ class Board:
                                   patterns[0] in self.get_data_string(diagonal2,symbol) or \
                                   patterns[1] in self.get_data_string(diagonal2,symbol)):
             return True
-        elif symbol == 'DOTS' and (patterns[2] in self.get_data_string(current_row,symbol) or \
+        elif symbol == 'COLOR' and (patterns[2] in self.get_data_string(current_row,symbol) or \
                                   patterns[3] in self.get_data_string(current_row,symbol) or \
                                   patterns[2] in self.get_data_string(current_column,symbol) or \
                                   patterns[3] in self.get_data_string(current_column,symbol) or \
@@ -94,7 +95,7 @@ class Board:
         self.current_player = current_player
 
     def get_current_player(self):
-        return self.current_player.get_play_choice
+        return self.current_player.get_play_choice() + " player won"
 
     def is_move_legal(self, x1, y1, x2, y2):
         if y1 > 0 and (self.matrix_data[x1][y1-1] == None or self.matrix_data[x2][y1-1] == None):

@@ -1,12 +1,13 @@
 import os
-from tabulate import tabulate
-from colored import fg, bg, attr
+
+# from colored import fg, bg, attr
 import numpy as np
 from utils import *
 from Board import *
 from Card import *
 from Cell import *
 from Player import *
+from tabulate import tabulate
 
 DOT = ['BLACK_DOT','WHITE_DOT']
 COLOR = ['RED_COLOR','WHITE_COLOR']
@@ -36,13 +37,13 @@ def assign_player_choices():
     choice = choice.upper()
     players = [None for i in range(NUM_PLAYERS)]
     players[0] = Player(choice)
-    players[1] = Player('COLOR' if choice == 'dots' else 'dots')
+    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS')
     return players
 
 def perform_player_regular_move(board):
     move = input('Play your move: \n')
     moveInfo = move.split(' ')
-    card = Card(ROTATIONS[int(moveInfo[1]) - 1], getXCoordinate(moveInfo[2]), getYCoordinate(moveInfo[3]))
+    card = Card(ROTATIONS[int(moveInfo[1]) - 1], getYCoordinate(moveInfo[3]), getXCoordinate(moveInfo[2]))
     move_success = board.place_card(card)
     if move_success == False:
         return perform_player_regular_move(board)

@@ -12,7 +12,7 @@ def getYCoordinate(yCellPosition):
     return int(yCellPosition) - 1
 
 def get_second_cell(rotation,x,y):
-    if rotation[0] == "HORIZONTAL":
+    if rotation[0] == "VERTICAL":
         return Cell(rotation[3],rotation[4],x+1,y)
     else:
         return Cell(rotation[3],rotation[4],x,y+1)
