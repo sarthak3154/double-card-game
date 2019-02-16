@@ -24,6 +24,7 @@ ROTATIONS = [[DIRECTION[0],DOT[0],COLOR[0],DOT[1],COLOR[1]],
 print('\n\t\t:::: Double Board Game ::::')
 NUM_PLAYERS = 2
 
+
 def select_play_mode():
     mode = input('\nSelect from the Play Modes: \n1. Human v Human\n2. Human v AI\n')
     if len(mode) > 1 or (mode.isnumeric() and (int(mode) > 2 or int(mode) < 1)):
@@ -31,6 +32,7 @@ def select_play_mode():
         return select_play_mode()
 
     return int(mode)
+
 
 def assign_player_choices():
     choice = input('\nPlayer 1, what do you want to play with? (dots or color): \n')
@@ -40,14 +42,16 @@ def assign_player_choices():
     players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS')
     return players
 
+
 def perform_player_regular_move(board):
     move = input('Play your move: \n')
     moveInfo = move.split(' ')
     card = Card(ROTATIONS[int(moveInfo[1]) - 1], get_col_coordinate(moveInfo[2]), get_row_coordinate(moveInfo[3]))
     move_success = board.place_card(card)
-    if move_success == False:
+    if move_success is False:
         return perform_player_regular_move(board)
     return True
+
 
 def perform_player_recycling_move(board):
     move = input('Play your move: \n')
@@ -72,7 +76,7 @@ def print_board(board):
     for i in range(np.size(board.matrix_data, 0)):
         # iterate over colums
         for j in range(np.size(board.matrix_data, 1)):
-            if board.matrix_data[i][j] != None:
+            if board.matrix_data[i][j] is not None:
                 dot_type = board.matrix_data[i][j].get_dot_type()
                 color_type = board.matrix_data[i][j].get_color_type()
                 print_matrix[i][j] = ('RC' if color_type == COLOR[0] else 'WC') +\
@@ -81,7 +85,9 @@ def print_board(board):
     print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
 
 n = -1
-def nextPlayer():
+
+
+def next_player():
     global n
     n+=1
     return n % NUM_PLAYERS
@@ -97,14 +103,14 @@ if playMode == 1:
     print_board(board)
 
     while board.get_placed_cards_count() < 24 and board.is_winner_found is False:
-        current_player = nextPlayer()
+        current_player = next_player()
         print('\nPlayer {0}, Your turn now...'.format(str(current_player + 1)))
         board.set_current_player(players[current_player])
         perform_player_regular_move(board)
         print_board(board)
 
     while board.is_winner_found is False and board.get_placed_cards_count() < 60:
-        current_player = nextPlayer()
+        current_player = next_player()
         print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(current_player + 1)))
         board.set_current_player(players[current_player])
         perform_player_recycling_move(board)
@@ -114,15 +120,3 @@ if playMode == 1:
         print(board.get_current_player())
     else:
         print('Game draw!')
-
-
-# def print_data(x,y):
-#     data = np.array([[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8],[1,2,3,4,5,6,7,8]])
-#     # diagonal1 = np.diagonal(data, y - x)
-#     # diagonal2 = np.diagonal(np.fliplr(data), y - x)
-#     print(data)
-#     print(np.size(data,1))
-#     print(np.diagonal(np.fliplr(data),(y-np.size(data,1) + 1)-x))
-#
-# print_data(2,8)
-

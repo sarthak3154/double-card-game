@@ -1,6 +1,7 @@
 import numpy as np
 from Cell import *
 
+
 class Board:
 
     def __init__(self, players):
