@@ -42,7 +42,7 @@ def assign_player_choices():
 def perform_player_regular_move(board):
     move = input('Play your move: \n')
     moveInfo = move.split(' ')
-    card = Card(ROTATIONS[int(moveInfo[1]) - 1], getXCoordinate(moveInfo[2]), getYCoordinate(moveInfo[3]))
+    card = Card(ROTATIONS[int(moveInfo[1]) - 1], get_col_coordinate(moveInfo[2]), get_row_coordinate(moveInfo[3]))
     move_success = board.place_card(card)
     if move_success == False:
         return perform_player_regular_move(board)
@@ -53,10 +53,10 @@ def perform_player_recycling_move(board):
     moveInfo = move.split(' ')
     first_cell = board.get_cell_info(getXCoordinate(moveInfo[0]), getYCoordinate(moveInfo[1]))
     second_cell = board.get_cell_info(getXCoordinate(moveInfo[2]), getYCoordinate(moveInfo[3]))
-    if is_valid_card_input([first_cell, second_cell]) is False:
+    if is_valid_pick_card_input([first_cell, second_cell]) is False:
         print('Invalid Input Card. Please input a valid card to be moved')
         return perform_player_recycling_move(board)
-    final_card = Card(ROTATIONS[int(moveInfo[4]) - 1], getXCoordinate(moveInfo[5]), getYCoordinate(moveInfo[6]))
+    final_card = Card(ROTATIONS[int(moveInfo[4]) - 1], get_col_coordinate(moveInfo[5]), get_row_coordinate(moveInfo[6]))
     move_success = board.move_card(first_cell, second_cell, final_card)
     if move_success is False:
         return perform_player_recycling_move(board)

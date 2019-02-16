@@ -1,6 +1,6 @@
 class Cell:
 
-    def __init__(self,dot,color,x,y):
+    def __init__(self,dot,color,y,x):
         self.dot = dot
         self.color = color
         self.x = x
