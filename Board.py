@@ -98,9 +98,11 @@ class Board:
         return self.current_player.get_play_choice() + " player won"
 
     def is_move_legal(self, x1, y1, x2, y2):
-        if y1 > 0 and (self.matrix_data[x1][y1-1] == None or self.matrix_data[x2][y1-1] == None):
+        if self.matrix_data[x1][y1] != None or self.matrix_data[x2][y2] != None:
             return False
-        if x1 < 0 or x1 >= 7 or y1 < 0 or y2 >= 12:
+        if x1 > 0 and (self.matrix_data[x1-1][y1] == None or (y1 != y2 and self.matrix_data[x1-1][y2] == None)):
+            return False
+        if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:
             return False
         return True
 

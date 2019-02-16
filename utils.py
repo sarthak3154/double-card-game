@@ -5,19 +5,19 @@ def cls():
     clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
     clear()
 
-def getXCoordinate(xCellPosition):
-    return ord(xCellPosition) % ord('A')
+def get_row_coordinate(xCellPosition):
+    return int(xCellPosition) - 1
 
-def getYCoordinate(yCellPosition):
-    return int(yCellPosition) - 1
+def get_col_coordinate(yCellPosition):
+    return ord(yCellPosition) % ord('A')
 
-def get_second_cell(rotation,x,y):
+def get_second_cell(rotation,y,x):
     if rotation[0] == "VERTICAL":
-        return Cell(rotation[3],rotation[4],x+1,y)
+        return Cell(rotation[3],rotation[4],y,x+1)
     else:
-        return Cell(rotation[3],rotation[4],x,y+1)
+        return Cell(rotation[3],rotation[4],y+1,x)
 
-def is_valid_card_input(cells):
+def is_valid_pick_card_input(cells):
     if cells[0] == None or cells[1] == None:
         return False
     x1 = cells[0].get_x_coordinate();
