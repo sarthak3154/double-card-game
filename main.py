@@ -29,11 +29,11 @@ def select_play_mode():
     return int(mode)
 
 def assign_player_choices():
-    choice = input('\nPlayer 1, what do you want to play with? (dots or color): ')
-    choice = choice.lower()
+    choice = input('\nPlayer 1, what do you want to play with? (dots or color): \n')
+    choice = choice.upper()
     players = [None for i in range(NUM_PLAYERS)]
     players[0] = Player(choice)
-    players[1] = Player('color' if choice == 'dots' else 'dots')
+    players[1] = Player('COLOR' if choice == 'dots' else 'dots')
     return players
 
 def perform_player_regular_move(board):
@@ -55,7 +55,7 @@ def perform_player_recycling_move(board):
         return perform_player_recycling_move(board)
     final_card = Card(ROTATIONS[int(moveInfo[4]) - 1], getXCoordinate(moveInfo[5]), getYCoordinate(moveInfo[6]))
     move_success = board.move_card(first_cell, second_cell, final_card)
-    if move_success == False:
+    if move_success is False:
         return perform_player_recycling_move(board)
     return True
 
@@ -72,15 +72,18 @@ if playMode == 1:
     print('\nYou have chosen to play in Manual Mode!')
     players = assign_player_choices()
     board = Board(players)
-    while board.get_placed_cards_count() < 24 and board.get_winner() == None:
-        print('\nPlayer {0}, Your turn now...'.format(str(nextPlayer() + 1)))
+    while board.get_placed_cards_count() < 24 and board.is_winner_found() == False:
+        current_player = nextPlayer()
+        print('\nPlayer {0}, Your turn now...'.format(str(current_player + 1)))
+        board.set_current_player(players[current_player])
         perform_player_regular_move(board)
 
-    while board.get_winner() == None and board.get_placed_cards_count() < 60:
-        print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(nextPlayer() + 1)))
+    while board.is_winner_found() == False and board.get_placed_cards_count() < 60:
+        current_player = nextPlayer() + 1
+        print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(current_player)))
         perform_player_recycling_move(board)
 
-    if board.get_winner() != None:
-        print(board.get_winner())
+    if board.is_winner_found() is True:
+        print(board.get_current_player())
     else:
         print('Game draw!')

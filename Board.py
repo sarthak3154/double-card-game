@@ -8,7 +8,8 @@ class Board:
         self.players = players
         self.placed_cards_count = 0
         self.last_card_placed = None
-        self.winner = None
+        self.current_player = None
+        self.is_winner_found = False
 
     def place_card(self, card):
         x1 = card.get_first_cell().get_x_coordinate()
@@ -21,7 +22,7 @@ class Board:
             self.matrix_data[x2][y2] = card.get_second_cell()
             self.placed_cards_count += 1
             self.last_card_placed = card
-            self.check_win(x1, y1, "DOT")
+            self.is_winner_found = self.check_win(x1, y1, self.current_player.get_play_choice())
             return True
         else:
             print('Invalid Move! Please input a valid move')
@@ -40,23 +41,23 @@ class Board:
         diagonal1 = np.diagonal(self.matrix_data)
         diagonal2 = np.diagonal(np.fliplr(self.matrix_data))
 
-        if symbol == 'COLOR' and (patterns[0] in self.get_data_string(current_row) or \
-                                  patterns[1] in self.get_data_string(current_row) or \
-                                  patterns[0] in self.get_data_string(current_column) or \
-                                  patterns[1] in self.get_data_string(current_column) or \
-                                  patterns[0] in self.get_data_string(diagonal1) or \
-                                  patterns[1] in self.get_data_string((diagonal1)) or \
-                                  patterns[0] in self.get_data_string(diagonal2) or \
-                                  patterns[1] in self.get_data_string((diagonal2))):
+        if symbol == 'COLOR' and (patterns[0] in self.get_data_string(current_row,symbol) or \
+                                  patterns[1] in self.get_data_string(current_row,symbol) or \
+                                  patterns[0] in self.get_data_string(current_column,symbol) or \
+                                  patterns[1] in self.get_data_string(current_column,symbol) or \
+                                  patterns[0] in self.get_data_string(diagonal1,symbol) or \
+                                  patterns[1] in self.get_data_string(diagonal1,symbol) or \
+                                  patterns[0] in self.get_data_string(diagonal2,symbol) or \
+                                  patterns[1] in self.get_data_string(diagonal2,symbol)):
             return True
-        elif symbol == 'DOT' and (patterns[2] in self.get_data_string(current_row) or \
-                                  patterns[3] in self.get_data_string(current_row) or \
-                                  patterns[2] in self.get_data_string(current_column) or \
-                                  patterns[3] in self.get_data_string(current_column) or \
-                                  patterns[2] in self.get_data_string(diagonal1) or \
-                                  patterns[3] in self.get_data_string((diagonal1)) or \
-                                  patterns[2] in self.get_data_string(diagonal2) or \
-                                  patterns[3] in self.get_data_string((diagonal2))):
+        elif symbol == 'DOTS' and (patterns[2] in self.get_data_string(current_row,symbol) or \
+                                  patterns[3] in self.get_data_string(current_row,symbol) or \
+                                  patterns[2] in self.get_data_string(current_column,symbol) or \
+                                  patterns[3] in self.get_data_string(current_column,symbol) or \
+                                  patterns[2] in self.get_data_string(diagonal1,symbol) or \
+                                  patterns[3] in self.get_data_string(diagonal1,symbol) or \
+                                  patterns[2] in self.get_data_string(diagonal2,symbol) or \
+                                  patterns[3] in self.get_data_string(diagonal2,symbol)):
             return True
         else:
             return False
@@ -86,8 +87,14 @@ class Board:
     def get_placed_cards_count(self):
         return self.placed_cards_count
 
-    def get_winner(self):
-        return self.winner
+    def is_winner_found(self):
+        return self.is_winner_found
+
+    def set_current_player(self,current_player):
+        self.current_player = current_player
+
+    def get_current_player(self):
+        return self.current_player.get_play_choice
 
     def is_move_legal(self, x1, y1, x2, y2):
         if y1 > 0 and (self.matrix_data[x1][y1-1] == None or self.matrix_data[x2][y1-1] == None):
