@@ -76,7 +76,7 @@ def print_board(board):
                 print_matrix[i][j] =  ('RC' if color_type == COLOR[0] else 'WC') +\
                                  ('*' if dot_type == DOT[0] else 'o')
 
-    print(tabulate(print_matrix, headers, tablefmt="fancy_grid"))
+    print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
 
 n = -1
 def nextPlayer():
