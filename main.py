@@ -7,7 +7,7 @@ from Board import *
 from Card import *
 from Cell import *
 from Player import *
-from tabulate import tabulate
+#from tabulate import tabulate
 
 DOT = ['BLACK_DOT','WHITE_DOT']
 COLOR = ['RED_COLOR','WHITE_COLOR']
@@ -38,8 +38,8 @@ def assign_player_choices():
     choice = input('\nPlayer 1, what do you want to play with? (dots or color): \n')
     choice = choice.upper()
     players = [None for i in range(NUM_PLAYERS)]
-    players[0] = Player(choice)
-    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS')
+    players[0] = Player(choice,'Player 1')
+    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS' , 'Player 2')
     return players
 
 
@@ -83,7 +83,8 @@ def print_board(board):
                 print_matrix[i][j] = ('RC' if color_type == COLOR[0] else 'WC') +\
                                  ('*' if dot_type == DOT[0] else 'o')
 
-    print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
+    #print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
+    print(np.flip(print_matrix,0))
 
 n = -1
 
@@ -118,6 +119,6 @@ if playMode == 1:
         print_board(board)
 
     if board.is_winner_found is True:
-        print(board.get_current_player())
+        print(str(board.get_current_player().get_player_name()) + " with play choice " + str(board.get_current_player().get_play_choice()) + " won the game ")
     else:
         print('Game draw!')

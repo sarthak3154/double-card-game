@@ -104,7 +104,7 @@ class Board:
         self.current_player = current_player
 
     def get_current_player(self):
-        return self.current_player.get_play_choice() + " player won"
+        return self.current_player
 
     def is_move_legal(self, x1, y1, x2, y2):
         if self.matrix_data[x1][y1] is not None or self.matrix_data[x2][y2] is not None:
