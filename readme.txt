@@ -13,4 +13,9 @@ Steps to run Deliverable 1 in computer labs:
    then just make sure it has enter or new line character in the command 
 10 After that play the game. :-)
 
+* - Black Dot
+o - White Dot
+RC - Red Color
+WC - White Color
+
 Note: Earlier we use the tabulate library to display the pretty output, however it could not installed on ENCS due to read-only access. Currently we outputing just matrix.
