@@ -84,10 +84,11 @@ def print_board(board):
                                  ('*' if dot_type == DOT[0] else 'o')
 
     # print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
-    print(np.flip(print_matrix,0))
+    flipped_matrix = np.flip(print_matrix,0)
+    print('\n'.join([''.join(['{:5}'.format(item if item is not '' else 'None') for item in row]) for row in flipped_matrix]))
+    print(''.join('{:5}'.format(index) for index in headers))
 
 n = -1
-
 
 def next_player():
     global n
