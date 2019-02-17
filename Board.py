@@ -8,7 +8,7 @@ class Board:
         self.matrix_data = np.empty((12, 8), dtype=object)
         self.players = players
         self.cards = {}
-        self.placed_cards_count = 0
+        self.placed_cards_count = 20
         self.last_card_placed = None
         self.current_player = None
         self.is_winner_found = False
@@ -73,21 +73,25 @@ class Board:
         else:
             return ' '.join(["None" if cell is None else cell.get_dot_type() for cell in direction])
 
-    def move_card(self, first_cell, second_cell, final_card):
+    def move_card(self, rotation, first_cell, second_cell, final_card):
         x1 = first_cell.get_x_coordinate()
         y1 = first_cell.get_y_coordinate()
         x2 = second_cell.get_x_coordinate()
         y2 = second_cell.get_y_coordinate()
         if self.is_recycler_move_legal(x1, y1, x2, y2) is False:
             return False
+        if self.is_same_position_place_move_legal(rotation, x1, y1, x2, y2, final_card) is False:
+            return False
+        self.matrix_data[x1][y1] = None
+        self.matrix_data[x2][y2] = None
         move_success = self.place_card(final_card)
         if move_success:
-            self.matrix_data[x1][y1] = None
-            self.matrix_data[x2][y2] = None
             del self.cards[(x1, y1)]
             del self.cards[(x2, y2)]
             return True
         else:
+            self.matrix_data[x1][y1] = first_cell
+            self.matrix_data[x2][y2] = second_cell   
             return False
 
     def get_placed_cards_count(self):
@@ -116,16 +120,29 @@ class Board:
         last_card_y1 = self.last_card_placed.get_first_cell().get_y_coordinate()
         last_card_x2 = self.last_card_placed.get_second_cell().get_x_coordinate()
         last_card_y2 = self.last_card_placed.get_second_cell().get_y_coordinate()
-        if self.cards.get((x1, y1)) == None or self.cards.get((x2, y2)) == None or self.cards[(x1, y1)] != (x2, y2) or self.cards[(x2, y2)] != (x1, y1):
+        if self.cards.get((x1, y1)) == None or self.cards.get((x2, y2)) == None \
+                or self.cards[(x1, y1)] != (x2, y2) or self.cards[(x2, y2)] != (x1, y1):
             print('Illegal Move. This is not a card placed at the board')
             return False
 
-        if (x1 == x2 and (self.get_cell_info(x1 + 1, y1) != None or self.get_cell_info(x1 + 1, y2) != None)) or self.get_cell_info(x2 + 1, y1) != None:
+        if (x1 == x2 and (self.get_cell_info(x1 + 1, y1) != None or self.get_cell_info(x1 + 1, y2) != None)) \
+                or self.get_cell_info(x2 + 1, y1) != None:
             print('Illegal Move. Cannot pick this card. Pick any card from the top')
             return False
 
         if last_card_x1 != x1 or last_card_y1 != y1 or last_card_x2 != x2 or last_card_y2 != y2:
             return True
-            
+
         print('Illegal Move. Cannot pick this card last chosen by another player')
+        return False
+
+    def is_same_position_place_move_legal(self, rotation, x1, y1, x2, y2, final_card):
+        final_x1 = final_card.get_first_cell().get_x_coordinate()
+        final_y1 = final_card.get_first_cell().get_y_coordinate()
+        final_x2 = final_card.get_second_cell().get_x_coordinate()
+        final_y2 = final_card.get_second_cell().get_y_coordinate()
+        if final_x1 != x1 or final_y1 != y1 or final_x2 != x2 or final_y2 != y2 or rotation != final_card.get_rotation():
+            return True
+
+        print('Illegal Move. Same position placement attempt with same rotation')
         return False

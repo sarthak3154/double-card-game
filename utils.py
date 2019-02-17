@@ -70,6 +70,4 @@ def get_orientation(cells):
         return 7
 
     if y2 - y1 is 0 and x2 - x1 > 0 and dot_type_1 is "WHITE_DOT" and color_type_1 is "RED_COLOR" and dot_type_2 is "BLACK_DOT" and color_type_2 is "WHITE_COLOR":
-        return 4
-
-
+        return 8

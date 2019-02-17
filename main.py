@@ -58,11 +58,12 @@ def perform_player_recycling_move(board):
     moveInfo = move.split(' ')
     first_cell = board.get_cell_info(get_row_coordinate(moveInfo[1]), get_col_coordinate(moveInfo[0]))
     second_cell = board.get_cell_info(get_row_coordinate(moveInfo[3]), get_col_coordinate(moveInfo[2]))
-    if is_valid_pick_card_input([first_cell, second_cell]) is False:
+    cells = [first_cell, second_cell]
+    if is_valid_pick_card_input(cells) is False:
         print('Invalid Input Card. Please input a valid card to be moved')
         return perform_player_recycling_move(board)
     final_card = Card(ROTATIONS[int(moveInfo[4]) - 1], get_col_coordinate(moveInfo[5]), get_row_coordinate(moveInfo[6]))
-    move_success = board.move_card(first_cell, second_cell, final_card)
+    move_success = board.move_card(ROTATIONS[get_orientation(cells) - 1], first_cell, second_cell, final_card)
     if move_success is False:
         return perform_player_recycling_move(board)
     return True
