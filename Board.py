@@ -84,14 +84,16 @@ class Board:
             return False
         self.matrix_data[x1][y1] = None
         self.matrix_data[x2][y2] = None
+        del self.cards[(x1, y1)]
+        del self.cards[(x2, y2)]
         move_success = self.place_card(final_card)
         if move_success:
-            del self.cards[(x1, y1)]
-            del self.cards[(x2, y2)]
             return True
         else:
             self.matrix_data[x1][y1] = first_cell
-            self.matrix_data[x2][y2] = second_cell   
+            self.matrix_data[x2][y2] = second_cell
+            self.cards[(x1, y1)] = (x2, y2)
+            self.cards[(x2, y2)] = (x1, y1)
             return False
 
     def get_placed_cards_count(self):

@@ -7,7 +7,7 @@ from Board import *
 from Card import *
 from Cell import *
 from Player import *
-#from tabulate import tabulate
+# from tabulate import tabulate
 
 DOT = ['BLACK_DOT','WHITE_DOT']
 COLOR = ['RED_COLOR','WHITE_COLOR']
@@ -83,7 +83,7 @@ def print_board(board):
                 print_matrix[i][j] = ('RC' if color_type == COLOR[0] else 'WC') +\
                                  ('*' if dot_type == DOT[0] else 'o')
 
-    #print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
+    # print(tabulate(np.flip(print_matrix, 0), headers, tablefmt="fancy_grid"))
     print(np.flip(print_matrix,0))
 
 n = -1
