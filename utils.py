@@ -25,7 +25,7 @@ def get_second_cell(rotation,y,x):
 def is_valid_pick_card_input(cells):
     if cells[0] == None or cells[1] == None:
         return False
-    x1 = cells[0].get_x_coordinate();
+    x1 = cells[0].get_x_coordinate()
     x2 = cells[1].get_x_coordinate()
     y1 = cells[0].get_y_coordinate()
     y2 = cells[1].get_y_coordinate()

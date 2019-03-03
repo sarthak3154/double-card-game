@@ -4,6 +4,11 @@ from Cell import *
 
 class Board:
 
+    white_circle = []
+    red_circle = []
+    white_dot = []
+    red_dot = []
+
     def __init__(self, players):
         self.matrix_data = np.empty((12, 8), dtype=object)
         self.players = players
@@ -24,6 +29,8 @@ class Board:
             self.matrix_data[x2][y2] = card.get_second_cell()
             self.placed_cards_count += 1
             self.last_card_placed = card
+            self.add_coordinates_to_specific_list(card.get_first_cell(),(x1,y1))
+            self.add_coordinates_to_specific_list(card.get_second_cell(),(x2, y2))
             self.cards[(x1, y1)] = (x2, y2)
             self.cards[(x2, y2)] = (x1, y1)
             self.is_winner_found = self.check_win(x1, y1, self.current_player.get_play_choice()) or \
@@ -35,6 +42,16 @@ class Board:
 
     def get_cell_info(self,x,y):
         return self.matrix_data[x][y]
+
+    def add_coordinates_to_specific_list(self,cell,coordinates):
+        if cell.get_color_type() == 'WHITE_COLOR' and cell.get_dot_type() == 'WHITE_DOT':
+            self.white_circle.append(coordinates)
+        if cell.get_color_type() == 'WHITE_COLOR' and cell.get_dot_type() == 'BLACK_DOT':
+            self.white_dot.append(coordinates)
+        if cell.get_color_type() == 'RED_COLOR' and cell.get_dot_type() == 'WHITE_DOT':
+            self.red_circle.append(coordinates)
+        if cell.get_color_type() == 'RED_COLOR' and cell.get_dot_type() == 'BLACK_DOT':
+            self.red_dot.append(coordinates)
 
     def check_win(self,x, y, symbol):
         patterns = ["BLACK_DOT BLACK_DOT BLACK_DOT BLACK_DOT",

@@ -7,6 +7,7 @@ from Board import *
 from Card import *
 from Cell import *
 from Player import *
+from random import randint
 # from tabulate import tabulate
 
 DOT = ['BLACK_DOT','WHITE_DOT']
@@ -34,12 +35,31 @@ def select_play_mode():
     return int(mode)
 
 
+def select_computer_turn():
+    mode = input('\nWhich turn does Computer with take (First or second) ?\nNote: use 1 and 2 for your input\n')
+    if len(mode) > 1 or (mode.isnumeric() and (int(mode) > 2 or int(mode) < 1)):
+        print('Invalid Input! Choose 1 or 2')
+        return select_computer_turn()
+
+    return int(mode)
+
+
 def assign_player_choices():
     choice = input('\nPlayer 1, what do you want to play with? (dots or color): \n')
     choice = choice.upper()
     players = [None for i in range(NUM_PLAYERS)]
     players[0] = Player(choice,'Player 1')
     players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS' , 'Player 2')
+    return players
+
+
+def assign_computer_choices():
+    random_number = randint(1,2)
+    choice = 'DOTS' if random_number is 1 else 'COLOR'
+    print('\nAI has choosen to play with ' + choice)
+    players = [None for i in range(NUM_PLAYERS)]
+    players[0] = Player(choice, 'AI')
+    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS', 'You')
     return players
 
 
@@ -122,3 +142,17 @@ if playMode == 1:
         print(str(board.get_current_player().get_player_name()) + " with play choice " + str(board.get_current_player().get_play_choice()) + " won the game ")
     else:
         print('Game draw!')
+
+if playMode == 2:
+    print('\nYou have chosen to play with Computer!')
+    turn = select_computer_turn()
+    if turn is 1:
+        players = assign_computer_choices()
+    elif turn is 2:
+        players = assign_player_choices()
+
+    board = Board(players)
+    headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
+    print_board(board)
+
+
