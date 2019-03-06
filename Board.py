@@ -126,11 +126,11 @@ class Board:
         return self.current_player
 
     def is_move_legal(self, x1, y1, x2, y2):
+        if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:
+            return False
         if self.matrix_data[x1][y1] is not None or self.matrix_data[x2][y2] is not None:
             return False
         if x1 > 0 and (self.matrix_data[x1-1][y1] is None or (y1 != y2 and self.matrix_data[x1-1][y2] is None)):
-            return False
-        if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:
             return False
         return True
 
@@ -190,3 +190,17 @@ class Board:
                 empty_row_elements = self.get_valid_empty_positions_in_row(i)
                 available_positions = available_positions + empty_row_elements
         return available_positions
+
+    def generate_init_position_moves(self, position_tuple):
+        x1 = position_tuple[0]
+        y1 = position_tuple[1]
+        valid_moves = []
+
+        if (self.is_move_legal(x1, y1, x1, y1 + 1)):
+            valid_moves.append([(x1, y1), (x1, y1 + 1)])
+        if (self.is_move_legal(x1, y1 - 1, x1, y1)):
+            valid_moves.append([(x1, y1 - 1), (x1, y1)])
+        if (self.is_move_legal(x1, y1, x1 + 1, y1)):
+            valid_moves.append([(x1, y1), (x1 + 1, y1)])
+
+        return valid_moves
