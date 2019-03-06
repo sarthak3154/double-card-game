@@ -7,6 +7,7 @@ class State:
         self.red_circle_coordinates = current_level_state.red_circle
         self.white_dot_coordinates = current_level_state.white_dot
         self.red_dot_coordinates = current_level_state.red_dot
+        self.card = new_card
         self.place_new_card(new_card)
 
     def place_new_card(self, card):
