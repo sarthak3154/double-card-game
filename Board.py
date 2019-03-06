@@ -165,3 +165,28 @@ class Board:
 
         print('Illegal Move. Same position placement attempt with same rotation')
         return False
+
+    def get_max_fillable_row(self):
+        BLANK_STATE = np.empty(np.size(self.matrix_data, 1), dtype=object)
+        for i in range(np.size(self.matrix_data, 0)):
+            if np.array_equal(self.matrix_data[i], BLANK_STATE):
+                return i + 1
+        return -1
+
+    def get_valid_empty_positions_in_row(self, row):
+        empty = []
+        for j in range(np.size(self.matrix_data, 1)):
+            if self.matrix_data[row][j] is None and (row == 0 or self.matrix_data[i-1][j] is not None):
+                empty.append((row, j))
+        return empty
+
+    def get_placeable_available_positions(self):
+        rows, cols = np.where(self.matrix_data == None)
+        rows = np.unique(rows)
+        max_fillable_row = self.get_max_fillable_row()
+        available_positions = []
+        for i in range(max_fillable_row):
+            if i in rows:
+                empty_row_elements = self.get_valid_empty_positions_in_row(i)
+                available_positions = available_positions + empty_row_elements
+        return available_positions

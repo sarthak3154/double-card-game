@@ -155,5 +155,4 @@ if playMode == 2:
     board = Board(players)
     headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
     print_board(board)
-
-
+    print(board.get_placeable_available_positions())
