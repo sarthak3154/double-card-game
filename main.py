@@ -90,8 +90,9 @@ def perform_player_recycling_move(board):
         return perform_player_recycling_move(board)
     return True
 
-def generate_states_from_position(parent_state_node, current_state, position_moves):
-    state_moves = []
+def generate_states_from_position(parent_state_node, position_moves):
+    current_state = parent_state_node.get_data()
+    move_state_nodes = []
     for move in position_moves:
          x1 = move[0][0]
          y1 = move[0][1]
@@ -102,20 +103,27 @@ def generate_states_from_position(parent_state_node, current_state, position_mov
             state = State(current_state, card)
             state_node = StateNode(state)
             state_node.parent = parent_state_node
-            state_moves.append(state_node)
-    return state_moves
+            move_state_nodes.append(state_node)
+    return move_state_nodes
 
-
-def perform_ai_regular_move(current_state, board):
+def get_children_states(current_state_node):
+    current_state = current_state_node.get_data()
     available_positions = current_state.get_placeable_available_positions()
-    move_states = []
-    root_state_node = StateNode(board)
+    move_state_nodes = []
     for position in available_positions:
         position_moves = current_state.generate_init_position_moves(position)
         # print(position_moves)
-        move_states = move_states + generate_states_from_position(root_state_node, board, position_moves)
-    root_state_node.children = move_states
-    # print(move_states)
+        move_state_nodes = move_state_nodes + generate_states_from_position(current_state_node, position_moves)
+    return move_state_nodes
+
+def perform_ai_regular_move(current_state, board):
+    root_state_node = StateNode(current_state)
+    root_state_node.children = get_children_states(root_state_node)
+    for child_state_node in root_state_node.children:
+         child_state_node.children = get_children_states(child_state_node)
+
+    print(root_state_node)
+    # TODO update board after hueristic move calculation
 
 
 dt = np.dtype('U10')

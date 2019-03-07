@@ -3,14 +3,21 @@ import numpy as np
 class State:
 
     def __init__(self, current_level_state, new_card=None):
-        self.current_level_matrix = current_level_state.matrix_data.copy()
         if new_card is not None:
+            self.current_level_matrix = current_level_state.current_level_matrix.copy()
+            self.white_circle_coordinates = current_level_state.white_circle_coordinates
+            self.red_circle_coordinates = current_level_state.red_circle_coordinates
+            self.white_dot_coordinates = current_level_state.white_dot_coordinates
+            self.red_dot_coordinates = current_level_state.red_dot_coordinates
+            self.card = new_card
+            self.place_new_card(new_card)
+        else:
+            self.current_level_matrix = current_level_state.matrix_data.copy()
             self.white_circle_coordinates = current_level_state.white_circle
             self.red_circle_coordinates = current_level_state.red_circle
             self.white_dot_coordinates = current_level_state.white_dot
             self.red_dot_coordinates = current_level_state.red_dot
-            self.card = new_card
-            self.place_new_card(new_card)
+
 
     def place_new_card(self, card):
         x1 = card.get_first_cell().get_x_coordinate()
@@ -80,7 +87,7 @@ class State:
     def get_valid_empty_positions_in_row(self, row):
         empty = []
         for j in range(np.size(self.current_level_matrix, 1)):
-            if self.current_level_matrix[row][j] is None and (row == 0 or self.current_level_matrix[i-1][j] is not None):
+            if self.current_level_matrix[row][j] is None and (row == 0 or self.current_level_matrix[row-1][j] is not None):
                 empty.append((row, j))
         return empty
 
