@@ -56,7 +56,7 @@ class State:
             print(x + "" + (y + 1))
             red_dot_value = red_dot_value + int(x + "" + (y+1))
 
-        return white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value)
+        return round(white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value) , 2)
 
 
 
