@@ -6,6 +6,7 @@ from utils import *
 from Board import *
 from Card import *
 from Cell import *
+from MiniMax import *
 from Player import *
 from StateNode import *
 from State import *
@@ -106,6 +107,7 @@ def generate_states_from_position(parent_state_node, position_moves):
             move_state_nodes.append(state_node)
     return move_state_nodes
 
+
 def get_children_states(current_state_node):
     current_state = current_state_node.get_data()
     available_positions = current_state.get_placeable_available_positions()
@@ -116,14 +118,21 @@ def get_children_states(current_state_node):
         move_state_nodes = move_state_nodes + generate_states_from_position(current_state_node, position_moves)
     return move_state_nodes
 
+
 def perform_ai_regular_move(current_state, board):
     root_state_node = StateNode(current_state)
     root_state_node.children = get_children_states(root_state_node)
+    leaf_nodes = []
     for child_state_node in root_state_node.children:
          child_state_node.children = get_children_states(child_state_node)
+         leaf_nodes = leaf_nodes + child_state_node.children
 
     print(root_state_node)
-    # TODO update board after hueristic move calculation
+    for leaf in leaf_nodes:
+        leaf.heuristic_value = leaf.get_data().get_heuristic_value()
+    minimax = MiniMax(root_state_node)
+    decision_state_node  = minimax.minimax_algorithm()
+    board.place_card(decision_state_node.data.card)
 
 
 dt = np.dtype('U10')

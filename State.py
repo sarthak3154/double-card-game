@@ -1,23 +1,23 @@
 import numpy as np
 
+
 class State:
 
     def __init__(self, current_level_state, new_card=None):
         if new_card is not None:
             self.current_level_matrix = current_level_state.current_level_matrix.copy()
-            self.white_circle_coordinates = current_level_state.white_circle_coordinates
-            self.red_circle_coordinates = current_level_state.red_circle_coordinates
-            self.white_dot_coordinates = current_level_state.white_dot_coordinates
-            self.red_dot_coordinates = current_level_state.red_dot_coordinates
+            self.white_circle_coordinates = current_level_state.white_circle_coordinates.copy()
+            self.red_circle_coordinates = current_level_state.red_circle_coordinates.copy()
+            self.white_dot_coordinates = current_level_state.white_dot_coordinates.copy()
+            self.red_dot_coordinates = current_level_state.red_dot_coordinates.copy()
             self.card = new_card
             self.place_new_card(new_card)
         else:
             self.current_level_matrix = current_level_state.matrix_data.copy()
-            self.white_circle_coordinates = current_level_state.white_circle
-            self.red_circle_coordinates = current_level_state.red_circle
-            self.white_dot_coordinates = current_level_state.white_dot
-            self.red_dot_coordinates = current_level_state.red_dot
-
+            self.white_circle_coordinates = current_level_state.white_circle.copy()
+            self.red_circle_coordinates = current_level_state.red_circle.copy()
+            self.white_dot_coordinates = current_level_state.white_dot.copy()
+            self.red_dot_coordinates = current_level_state.red_dot.copy()
 
     def place_new_card(self, card):
         x1 = card.get_first_cell().get_x_coordinate()
@@ -45,22 +45,22 @@ class State:
             self.red_dot_coordinates.append(coordinates)
 
     def get_heuristic_value(self):
+        white_circle_value = 0
+        white_dot_value = 0
+        red_circle_value = 0
+        red_dot_value = 0
 
         for (x,y) in self.white_circle_coordinates:
-            print(x + "" + (y+1))
-            white_circle_value = white_circle_value + int(x + "" + (y+1))
+            white_circle_value = white_circle_value + int(str(x) + str((y+1)))
 
         for (x,y) in self.white_dot_coordinates:
-            print(x + "" + (y + 1))
-            white_dot_value = white_dot_value + int(x + "" + (y+1))
+            white_dot_value = white_dot_value + int(str(x) + str((y+1)))
 
         for (x,y) in self.red_circle_coordinates:
-            print(x + "" + (y + 1))
-            red_circle_value = red_circle_value + int(x + "" + (y+1))
+            red_circle_value = red_circle_value + int(str(x) + str((y+1)))
 
         for (x,y) in self.red_dot_coordinates:
-            print(x + "" + (y + 1))
-            red_dot_value = red_dot_value + int(x + "" + (y+1))
+            red_dot_value = red_dot_value + int(str(x) + str((y+1)))
 
         return round(white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value) , 2)
 
@@ -71,8 +71,8 @@ class State:
         valid_moves = []
         if (self.is_move_legal(x1, y1, x1, y1 + 1)):
             valid_moves.append([(x1, y1), (x1, y1 + 1)])
-        if (self.is_move_legal(x1, y1 - 1, x1, y1)):
-            valid_moves.append([(x1, y1 - 1), (x1, y1)])
+        # if (self.is_move_legal(x1, y1 - 1, x1, y1)):
+        #     valid_moves.append([(x1, y1 - 1), (x1, y1)])
         if (self.is_move_legal(x1, y1, x1 + 1, y1)):
             valid_moves.append([(x1, y1), (x1 + 1, y1)])
         return valid_moves

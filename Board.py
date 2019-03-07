@@ -4,10 +4,7 @@ from Cell import *
 
 class Board:
 
-    white_circle = []
-    red_circle = []
-    white_dot = []
-    red_dot = []
+
 
     def __init__(self, players):
         self.matrix_data = np.empty((12, 8), dtype=object)
@@ -17,6 +14,10 @@ class Board:
         self.last_card_placed = None
         self.current_player = None
         self.is_winner_found = False
+        self.white_circle = []
+        self.red_circle = []
+        self.white_dot = []
+        self.red_dot = []
 
     def place_card(self, card):
         x1 = card.get_first_cell().get_x_coordinate()
