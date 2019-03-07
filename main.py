@@ -7,6 +7,8 @@ from Board import *
 from Card import *
 from Cell import *
 from Player import *
+from StateNode import *
+from State import *
 from random import randint
 # from tabulate import tabulate
 
@@ -36,7 +38,7 @@ def select_play_mode():
 
 
 def select_computer_turn():
-    mode = input('\nWhich turn does Computer with take (First or second) ?\nNote: use 1 and 2 for your input\n')
+    mode = input('\nWhich turn does Computer will take (First or second) ?\nNote: use 1 and 2 for your input\n')
     if len(mode) > 1 or (mode.isnumeric() and (int(mode) > 2 or int(mode) < 1)):
         print('Invalid Input! Choose 1 or 2')
         return select_computer_turn()
@@ -44,12 +46,12 @@ def select_computer_turn():
     return int(mode)
 
 
-def assign_player_choices():
+def assign_player_choices(play_mode='human'):
     choice = input('\nPlayer 1, what do you want to play with? (dots or color): \n')
     choice = choice.upper()
     players = [None for i in range(NUM_PLAYERS)]
     players[0] = Player(choice,'Player 1')
-    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS' , 'Player 2')
+    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS' , 'Player 2' if play_mode == 'human' else 'AI')
     return players
 
 
@@ -87,6 +89,33 @@ def perform_player_recycling_move(board):
     if move_success is False:
         return perform_player_recycling_move(board)
     return True
+
+def generate_states_from_position(parent_state_node, current_state, position_moves):
+    state_moves = []
+    for move in position_moves:
+         x1 = move[0][0]
+         y1 = move[0][1]
+         x2 = move[1][0]
+         y2 = move[1][1]
+         for i in range(4):
+            card = Card(ROTATIONS[(2 * i) if x1 == x2 else (2 * i + 1)], y1, x1)
+            state = State(current_state, card)
+            state_node = StateNode(state)
+            state_node.parent = parent_state_node
+            state_moves.append(state_node)
+    return state_moves
+
+
+def perform_ai_regular_move(board):
+    available_positions = board.get_placeable_available_positions()
+    move_states = []
+    root_state_node = StateNode(board)
+    for position in available_positions:
+        position_moves = board.generate_init_position_moves(position)
+        # print(position_moves)
+        move_states = move_states + generate_states_from_position(root_state_node, board, position_moves)
+    root_state_node.children = move_states
+    # print(move_states)
 
 
 dt = np.dtype('U10')
@@ -150,14 +179,18 @@ if playMode == 2:
     if turn is 1:
         players = assign_computer_choices()
     elif turn is 2:
-        players = assign_player_choices()
+        players = assign_player_choices('ai')
 
     board = Board(players)
     headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
     print_board(board)
 
-    # tuples of available positions for the current state
-    available_positions = board.get_placeable_available_positions()
-    print(available_positions)
-    for position in available_positions:
-        print(board.generate_init_position_moves(position))
+    while board.get_placed_cards_count() < 24 and board.is_winner_found is False:
+        current_player = players[next_player()]
+        print('\n{0}, Your turn now...'.format(str(current_player.get_player_name())))
+        board.set_current_player(current_player)
+        if current_player.get_player_name() == 'AI':
+            perform_ai_regular_move(board)
+        else:
+            perform_player_regular_move(board)
+        print_board(board)

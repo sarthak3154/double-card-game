@@ -192,14 +192,16 @@ class Board:
         return available_positions
 
     def generate_init_position_moves(self, position_tuple):
+        # print(position_tuple)
         x1 = position_tuple[0]
         y1 = position_tuple[1]
         valid_moves = []
-
         if (self.is_move_legal(x1, y1, x1, y1 + 1)):
             valid_moves.append([(x1, y1), (x1, y1 + 1)])
+
         if (self.is_move_legal(x1, y1 - 1, x1, y1)):
             valid_moves.append([(x1, y1 - 1), (x1, y1)])
+
         if (self.is_move_legal(x1, y1, x1 + 1, y1)):
             valid_moves.append([(x1, y1), (x1 + 1, y1)])
 

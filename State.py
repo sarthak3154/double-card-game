@@ -2,7 +2,7 @@
 class State:
 
     def __init__(self, current_level_state, new_card):
-        self.current_level_matrix = current_level_state.matrix_data
+        self.current_level_matrix = current_level_state.matrix_data.copy()
         self.white_circle_coordinates = current_level_state.white_circle
         self.red_circle_coordinates = current_level_state.red_circle
         self.white_dot_coordinates = current_level_state.white_dot
@@ -14,8 +14,6 @@ class State:
         y1 = card.get_first_cell().get_y_coordinate()
         x2 = card.get_second_cell().get_x_coordinate()
         y2 = card.get_second_cell().get_y_coordinate()
-        print("first cell" + x1 + " " + y1)
-        print("second cell " + x2 + " " + y2)
         move_state = self.is_move_legal(x1, y1, x2, y2)
         if move_state:
             self.current_level_matrix[x1][y1] = card.get_first_cell()
@@ -24,7 +22,6 @@ class State:
             self.add_coordinates_to_specific_list(card.get_second_cell(), (x2, y2))
             return True
         else:
-            print('Invalid Move! Please input a valid move')
             return False
 
     def add_coordinates_to_specific_list(self,cell,coordinates):
@@ -57,6 +54,11 @@ class State:
 
         return white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value)
 
-
-
-
+    def is_move_legal(self, x1, y1, x2, y2):
+        if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:
+            return False
+        if self.current_level_matrix[x1][y1] is not None or self.current_level_matrix[x2][y2] is not None:
+            return False
+        if x1 > 0 and (self.current_level_matrix[x1-1][y1] is None or (y1 != y2 and self.current_level_matrix[x1-1][y2] is None)):
+            return False
+        return True

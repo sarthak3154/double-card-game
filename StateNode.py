@@ -1,6 +1,6 @@
 class StateNode:
 
-    def __init__(self, data, heuristic_value, parent=None, children=None):
+    def __init__(self, data, children=None, parent=None, heuristic_value=None):
         self.data = data
         self.parent = parent
         self.children = []
