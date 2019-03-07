@@ -7,6 +7,7 @@ class State:
         self.red_circle_coordinates = current_level_state.red_circle
         self.white_dot_coordinates = current_level_state.white_dot
         self.red_dot_coordinates = current_level_state.red_dot
+        self.card = new_card
         self.place_new_card(new_card)
 
     def place_new_card(self, card):
@@ -52,7 +53,7 @@ class State:
             print(x + "" + (y + 1))
             red_dot_value = red_dot_value + int(x + "" + (y+1))
 
-        return white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value)
+        return round(white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value) , 2)
 
     def is_move_legal(self, x1, y1, x2, y2):
         if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:

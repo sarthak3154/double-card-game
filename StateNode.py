@@ -12,9 +12,6 @@ class StateNode:
     def add_child(self, node):
         self.children.append(node)
 
-    def get_children(self):
-        return self.children
-
     def get_parent(self):
         return self.parent
 
