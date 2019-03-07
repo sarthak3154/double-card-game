@@ -106,12 +106,12 @@ def generate_states_from_position(parent_state_node, current_state, position_mov
     return state_moves
 
 
-def perform_ai_regular_move(board):
-    available_positions = board.get_placeable_available_positions()
+def perform_ai_regular_move(current_state, board):
+    available_positions = current_state.get_placeable_available_positions()
     move_states = []
     root_state_node = StateNode(board)
     for position in available_positions:
-        position_moves = board.generate_init_position_moves(position)
+        position_moves = current_state.generate_init_position_moves(position)
         # print(position_moves)
         move_states = move_states + generate_states_from_position(root_state_node, board, position_moves)
     root_state_node.children = move_states
@@ -190,7 +190,8 @@ if playMode == 2:
         print('\n{0}, Your turn now...'.format(str(current_player.get_player_name())))
         board.set_current_player(current_player)
         if current_player.get_player_name() == 'AI':
-            perform_ai_regular_move(board)
+            current_state = State(board)
+            perform_ai_regular_move(current_state, board)
         else:
             perform_player_regular_move(board)
         print_board(board)
