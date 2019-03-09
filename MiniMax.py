@@ -3,8 +3,9 @@ import math
 
 class MiniMax:
 
-    def __init__(self,root):
+    def __init__(self,root,type):
         self.root_state_node = root
+        self.type = type
 
     def maximize(self,state_node):
         maximum_heuristic_value = - math.inf
@@ -29,17 +30,21 @@ class MiniMax:
         return minimum_heuristic_value
 
     def minimax_algorithm(self):
-        decision_value = self.maximize(self.root_state_node)
+        if self.type is "COLOR":
+            decision_value = self.maximize(self.root_state_node)
+        else:
+            decision_value = self.minimize(self.root_state_node)
+        self.root_state_node.heuristic_value = decision_value
         print(decision_value)
         children = self.root_state_node.children
         decision_state = [child for child in children if child.heuristic_value == decision_value]
         return decision_state[0]
 
     def write_nodes_data_to_trace_file(self):
-        f = open("tracemm.txt", "w+")
-        f.write(self.root_state_node.heuristic_value + "\n")
+        f = open("tracemm.txt", "a+")
+        f.write(str(self.root_state_node.heuristic_value) + "\n")
         f.write("\n")
         for child in self.root_state_node.children:
-            f.write(child.heuristic_value + "\n")
+            f.write(str(child.heuristic_value) + "\n")
         f.write("\n")
         f.close()

@@ -128,10 +128,16 @@ def perform_ai_regular_move(current_state, board):
          leaf_nodes = leaf_nodes + child_state_node.children
 
     print(root_state_node)
+    count  = 0
     for leaf in leaf_nodes:
         leaf.heuristic_value = leaf.get_data().get_heuristic_value()
+        count = count  + 1
+    f = open("tracemm.txt", "a+")
+    f.write(str(count) + "\n")
+    f.close()
     minimax = MiniMax(root_state_node)
     decision_state_node  = minimax.minimax_algorithm()
+    minimax.write_nodes_data_to_trace_file()
     board.place_card(decision_state_node.data.card)
 
 

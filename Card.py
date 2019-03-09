@@ -2,6 +2,7 @@ from Board import Board
 from Cell import *
 from utils import *
 
+
 class Card:
 
     def __init__(self,rotation, ycoordinate, xcoordinate):
