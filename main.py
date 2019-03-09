@@ -120,8 +120,8 @@ def is_valid_place_card_move(pick_card, place_card):
     return True
 
 
-def generate_states_from_position(parent_state_node, position_moves, pick_card=None):
-    current_state = parent_state_node.get_data()
+def generate_states_from_position(parent_state_node, position_moves, recycler_parent_node=None, pick_card=None):
+    current_state = parent_state_node.get_data() if recycler_parent_node is None else recycler_parent_node.get_data()
     move_state_nodes = []
     for move in position_moves:
         x1 = move[0][0]
@@ -132,19 +132,19 @@ def generate_states_from_position(parent_state_node, position_moves, pick_card=N
             if pick_card is None or (pick_card is not None and is_valid_place_card_move(pick_card, card)):
                 state = State(current_state, card)
                 state_node = StateNode(state)
-                state_node.parent = parent_state_node
+                state_node.parent = parent_state_node if recycler_parent_node is None else recycler_parent_node
                 move_state_nodes.append(state_node)
     return move_state_nodes
 
 
-def get_children_states(current_state_node, pick_card=None):
+def get_children_states(current_state_node, recycler_parent_node=None, pick_card=None):
     current_state = current_state_node.get_data()
     available_positions = current_state.get_placeable_available_positions()
     move_state_nodes = []
     for position in available_positions:
         position_moves = current_state.generate_init_position_moves(position)
         # print(position_moves)
-        move_state_nodes = move_state_nodes + generate_states_from_position(current_state_node, position_moves, pick_card)
+        move_state_nodes = move_state_nodes + generate_states_from_position(current_state_node, position_moves, recycler_parent_node, pick_card)
     return move_state_nodes
 
 
@@ -179,16 +179,31 @@ def perform_ai_regular_move(current_state, board, ai_choice, is_active, is_trace
     board.place_card(decision_state_node.data.card)
 
 
-def perform_ai_recycling_move(current_state, board):
-    card_positions = current_state.get_pickable_available_cards()
-    root_state_node = StateNode(current_state)
+def get_recycler_move_children_states(current_state_node):
+    card_positions = current_state_node.data.get_pickable_available_cards()
+    children_state_nodes = []
+
     for position in card_positions:
         pick_state = State(board)
         pick_card = pick_state.get_card(ROTATIONS, position)
         pick_state.remove_card(position, pick_state.cards[position])
         state_node = StateNode(pick_state)
-        root_state_node.children = root_state_node.children + get_children_states(state_node, pick_card)
-    print(root_state_node.children)
+        children_state_nodes = children_state_nodes + get_children_states(state_node, current_state_node, pick_card)
+
+    return children_state_nodes
+
+
+def perform_ai_recycling_move(current_state, board):
+    root_state_node = StateNode(current_state)
+    root_state_node.children = get_recycler_move_children_states(root_state_node)
+
+    for child_state_node in root_state_node.children:
+        child_state_node.children = get_recycler_move_children_states(child_state_node)
+
+    algo = MiniMax(root_state_node, ai_choice)
+    decision_state_node = algo.minimax_algorithm()
+    board.place_card(decision_state_node.data.card)
+
 
 dt = np.dtype('U10')
 
@@ -265,7 +280,7 @@ if playMode == 2:
     headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
     print_board(board)
 
-    while board.get_placed_cards_count() < 24 and board.is_winner_found is False:
+    while board.get_placed_cards_count() < 8 and board.is_winner_found is False:
         current_player = players[next_player()]
         print('\n{0}, Your turn now...'.format(str(current_player.get_player_name())))
         board.set_current_player(current_player)
