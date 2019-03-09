@@ -7,6 +7,7 @@ from Board import *
 from Card import *
 from Cell import *
 from MiniMax import *
+from AlphaBeta import *
 from Player import *
 from StateNode import *
 from State import *
@@ -45,6 +46,23 @@ def select_computer_turn():
         return select_computer_turn()
 
     return int(mode)
+
+
+def alpha_beta_trace_input():
+    active = input('\nDo you want to activate alpha-beta algorithm  ?\n 1. Yes  2.No \n')
+    if len(active) > 1 or (active.isnumeric() and (int(active) > 2 or int(active) < 1)):
+        print('Invalid Input! Choose 1 or 2')
+        return alpha_beta_trace_input()
+
+    trace = input('\nDo you want to generate trace file ?\n 1. Yes  2.No \n')
+    if len(trace) > 1 or (trace.isnumeric() and (int(trace) > 2 or int(trace) < 1)):
+        print('Invalid Input! Choose 1 or 2')
+        return alpha_beta_trace_input()
+
+    is_active = True if int(active) is 1 else False
+    is_trace = True if int(trace) is 1 else False
+
+    return is_active,is_trace
 
 
 def assign_player_choices(play_mode='human'):
@@ -119,25 +137,34 @@ def get_children_states(current_state_node):
     return move_state_nodes
 
 
-def perform_ai_regular_move(current_state, board):
+def perform_ai_regular_move(current_state, board,ai_choice,is_active,is_trace):
     root_state_node = StateNode(current_state)
     root_state_node.children = get_children_states(root_state_node)
     leaf_nodes = []
     for child_state_node in root_state_node.children:
-         child_state_node.children = get_children_states(child_state_node)
-         leaf_nodes = leaf_nodes + child_state_node.children
+        child_state_node.children = get_children_states(child_state_node)
+        leaf_nodes = leaf_nodes + child_state_node.children
 
-    print(root_state_node)
-    count  = 0
+    count = 0
     for leaf in leaf_nodes:
         leaf.heuristic_value = leaf.get_data().get_heuristic_value()
         count = count  + 1
-    f = open("tracemm.txt", "a+")
-    f.write(str(count) + "\n")
-    f.close()
-    minimax = MiniMax(root_state_node)
-    decision_state_node  = minimax.minimax_algorithm()
-    minimax.write_nodes_data_to_trace_file()
+
+    decision_state_node = None
+    algo = None
+    if is_active:
+        algo = AlphaBeta(root_state_node,ai_choice)
+        decision_state_node = algo.alpha_beta_algorithm()
+    else:
+        algo = MiniMax(root_state_node,ai_choice)
+        decision_state_node = algo.minimax_algorithm()
+
+    if is_trace:
+        f = open("tracemm.txt", "a+")
+        f.write(str(count) + "\n")
+        f.close()
+        algo.write_nodes_data_to_trace_file()
+
     board.place_card(decision_state_node.data.card)
 
 
@@ -198,11 +225,14 @@ if playMode == 1:
 
 if playMode == 2:
     print('\nYou have chosen to play with Computer!')
+    (is_active,is_trace) = alpha_beta_trace_input()
     turn = select_computer_turn()
     if turn is 1:
         players = assign_computer_choices()
+        ai_choice = players[0].play_choice
     elif turn is 2:
         players = assign_player_choices('ai')
+        ai_choice = players[1].play_choice
 
     board = Board(players)
     headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
@@ -214,7 +244,7 @@ if playMode == 2:
         board.set_current_player(current_player)
         if current_player.get_player_name() == 'AI':
             current_state = State(board)
-            perform_ai_regular_move(current_state, board)
+            perform_ai_regular_move(current_state, board, ai_choice, is_active, is_trace)
         else:
             perform_player_regular_move(board)
         print_board(board)
