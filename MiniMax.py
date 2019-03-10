@@ -6,10 +6,13 @@ class MiniMax:
     def __init__(self,root,type):
         self.root_state_node = root
         self.type = type
+        self.count = 0
 
     def maximize(self,state_node):
-        maximum_heuristic_value = - math.inf
+        maximum_heuristic_value = -math.inf
         if state_node is not None and len(state_node.children) == 0:
+            self.count = self.count + 1
+            state_node.heuristic_value = state_node.get_data().get_heuristic_value()
             return state_node.heuristic_value
 
         children = state_node.children
@@ -21,10 +24,11 @@ class MiniMax:
     def minimize(self,state_node):
         minimum_heuristic_value = math.inf
         if state_node is not None and len(state_node.children) == 0:
+            self.count = self.count + 1
+            state_node.heuristic_value = state_node.get_data().get_heuristic_value()
             return state_node.heuristic_value
         children = state_node.children
         for child in children:
-            # Need to test
             child.heuristic_value = self.maximize(child)
             minimum_heuristic_value = min(child.heuristic_value, minimum_heuristic_value)
         return minimum_heuristic_value
@@ -42,6 +46,7 @@ class MiniMax:
 
     def write_nodes_data_to_trace_file(self):
         f = open("tracemm.txt", "a+")
+        f.write(str(self.count) + "\n")
         f.write(str(self.root_state_node.heuristic_value) + "\n")
         f.write("\n")
         for child in self.root_state_node.children:
