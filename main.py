@@ -10,7 +10,7 @@ from MiniMax import *
 from AlphaBeta import *
 from Player import *
 from StateNode import *
-from State import *
+from State import State
 from random import randint
 
 # from tabulate import tabulate
@@ -50,12 +50,12 @@ def select_computer_turn():
 
 
 def alpha_beta_trace_input():
-    active = input('\nDo you want to activate alpha-beta algorithm  ?\n 1. Yes  2.No \n')
+    active = input('\nDo you want to activate alpha-beta algorithm  ?\n 1. Yes  2. No \n')
     if len(active) > 1 or (active.isnumeric() and (int(active) > 2 or int(active) < 1)):
         print('Invalid Input! Choose 1 or 2')
         return alpha_beta_trace_input()
 
-    trace = input('\nDo you want to generate trace file ?\n 1. Yes  2.No \n')
+    trace = input('\nDo you want to generate trace file ?\n 1. Yes  2. No \n')
     if len(trace) > 1 or (trace.isnumeric() and (int(trace) > 2 or int(trace) < 1)):
         print('Invalid Input! Choose 1 or 2')
         return alpha_beta_trace_input()
@@ -71,7 +71,7 @@ def assign_player_choices(play_mode='human'):
     choice = choice.upper()
     players = [None for i in range(NUM_PLAYERS)]
     players[0] = Player(choice,'AI' if play_mode is 'ai' else 'Human')
-    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS', 'Human' if play_mode == 'ai' else 'AI')
+    players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS', 'Human' if play_mode is'ai' else 'AI')
     return players
 
 
@@ -101,31 +101,41 @@ def perform_player_recycling_move(board):
     return True
 
 
-def generate_states_from_position(parent_state_node, position_moves):
-    current_state = parent_state_node.get_data()
+def is_valid_place_card_move(pick_card, place_card):
+    if (pick_card.first_cell.x == place_card.first_cell.x and pick_card.first_cell.y == place_card.first_cell.y
+            and pick_card.second_cell.x == place_card.second_cell.x and
+            pick_card.second_cell.y == place_card.second_cell.y):
+        if pick_card.rotation == place_card.rotation:
+            return False
+    return True
+
+
+def generate_states_from_position(parent_state_node, position_moves, recycler_parent_node=None, pick_card=None):
+    current_state = parent_state_node.get_data() if recycler_parent_node is None else recycler_parent_node.get_data()
     move_state_nodes = []
     for move in position_moves:
         x1 = move[0][0]
         y1 = move[0][1]
         x2 = move[1][0]
-        y2 = move[1][1]
+
         for i in range(4):
             card = Card(ROTATIONS[(2 * i) if x1 == x2 else (2 * i + 1)], y1, x1)
-            state = State(current_state, card)
-            state_node = StateNode(state)
-            state_node.parent = parent_state_node
-            move_state_nodes.append(state_node)
+            if pick_card is None or (pick_card is not None and is_valid_place_card_move(pick_card, card)):
+                state = State(current_state, card)
+                state_node = StateNode(state)
+                state_node.parent = parent_state_node if recycler_parent_node is None else recycler_parent_node
+                move_state_nodes.append(state_node)
     return move_state_nodes
 
 
-def get_children_states(current_state_node):
+def get_children_states(current_state_node, recycler_parent_node=None, pick_card=None):
     current_state = current_state_node.get_data()
     available_positions = current_state.get_placeable_available_positions()
     move_state_nodes = []
     for position in available_positions:
         position_moves = current_state.generate_init_position_moves(position)
         # print(position_moves)
-        move_state_nodes = move_state_nodes + generate_states_from_position(current_state_node, position_moves)
+        move_state_nodes = move_state_nodes + generate_states_from_position(current_state_node, position_moves, recycler_parent_node, pick_card)
     return move_state_nodes
 
 
@@ -138,6 +148,7 @@ def perform_ai_regular_move(current_state, board, ai_choice, is_active, is_trace
     if is_active:
         algo = AlphaBeta(root_state_node, ai_choice)
         decision_state_node = algo.alpha_beta_algorithm(2)
+
     else:
         algo = MiniMax(root_state_node, ai_choice)
         decision_state_node = algo.minimax_algorithm()
@@ -145,6 +156,32 @@ def perform_ai_regular_move(current_state, board, ai_choice, is_active, is_trace
     if is_trace:
         algo.write_nodes_data_to_trace_file()
 
+    board.place_card(decision_state_node.data.card)
+
+
+def get_recycler_move_children_states(current_state_node):
+    card_positions = current_state_node.data.get_pickable_available_cards()
+    children_state_nodes = []
+
+    for position in card_positions:
+        pick_state = State(board)
+        pick_card = pick_state.get_card(ROTATIONS, position)
+        pick_state.remove_card(position, pick_state.cards[position])
+        state_node = StateNode(pick_state)
+        children_state_nodes = children_state_nodes + get_children_states(state_node, current_state_node, pick_card)
+
+    return children_state_nodes
+
+
+def perform_ai_recycling_move(current_state, board):
+    root_state_node = StateNode(current_state)
+    root_state_node.children = get_recycler_move_children_states(root_state_node)
+
+    for child_state_node in root_state_node.children:
+        child_state_node.children = get_recycler_move_children_states(child_state_node)
+
+    algo = MiniMax(root_state_node, ai_choice)
+    decision_state_node = algo.minimax_algorithm()
     board.place_card(decision_state_node.data.card)
 
 
@@ -223,7 +260,7 @@ if playMode == 2:
     headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
     print_board(board)
 
-    while board.get_placed_cards_count() < 24 and board.is_winner_found is False:
+    while board.get_placed_cards_count() < 8 and board.is_winner_found is False:
         current_player = players[next_player()]
         print('\n{0}, Your turn now...'.format(str(current_player.get_player_name())))
         board.set_current_player(current_player)
@@ -233,3 +270,6 @@ if playMode == 2:
         else:
             perform_player_regular_move(board)
         print_board(board)
+
+    current_state = State(board)
+    perform_ai_recycling_move(current_state, board)

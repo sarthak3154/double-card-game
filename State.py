@@ -1,9 +1,15 @@
 import numpy as np
 
+from Card import Card
+from utils import get_orientation
+
 
 class State:
 
     def __init__(self, current_level_state, new_card=None):
+        self.placed_cards_count = current_level_state.placed_cards_count
+        self.last_card_placed = current_level_state.last_card_placed
+        self.cards = current_level_state.cards.copy()
         if new_card is not None:
             self.current_level_matrix = current_level_state.current_level_matrix.copy()
             self.white_circle_coordinates = current_level_state.white_circle_coordinates.copy()
@@ -28,6 +34,10 @@ class State:
         if move_state:
             self.current_level_matrix[x1][y1] = card.get_first_cell()
             self.current_level_matrix[x2][y2] = card.get_second_cell()
+            self.placed_cards_count += 1
+            self.last_card_placed = card
+            self.cards[(x1, y1)] = (x2, y2)
+            self.cards[(x2, y2)] = (x1, y1)
             self.add_coordinates_to_specific_list(card.get_first_cell(), (x1, y1))
             self.add_coordinates_to_specific_list(card.get_second_cell(), (x2, y2))
             return True
@@ -66,14 +76,13 @@ class State:
 
     def generate_init_position_moves(self, position_tuple):
         # print(position_tuple)
-        x1 = position_tuple[0]
-        y1 = position_tuple[1]
+        x1, y1 = position_tuple
         valid_moves = []
-        if (self.is_move_legal(x1, y1, x1, y1 + 1)):
+        if self.is_move_legal(x1, y1, x1, y1 + 1):
             valid_moves.append([(x1, y1), (x1, y1 + 1)])
         # if (self.is_move_legal(x1, y1 - 1, x1, y1)):
         #     valid_moves.append([(x1, y1 - 1), (x1, y1)])
-        if (self.is_move_legal(x1, y1, x1 + 1, y1)):
+        if self.is_move_legal(x1, y1, x1 + 1, y1):
             valid_moves.append([(x1, y1), (x1 + 1, y1)])
         return valid_moves
 
@@ -102,6 +111,51 @@ class State:
                 available_positions = available_positions + empty_row_elements
         return available_positions
 
+    def check_pick_position_condition(self, x1, y1, x_max):
+        return self.current_level_matrix[x1][y1] is not None and \
+            (x1 == x_max or self.current_level_matrix[x1 + 1][y1] is None)
+
+    def get_pickable_available_cards(self):
+        x_max = np.size(self.current_level_matrix, 0) - 1
+        current_x = x_max
+        chosen_cards = []
+        while current_x >= 0:
+            row_card_pick_possible = False
+            empty_cell_found = False
+            for j in range(np.size(self.current_level_matrix, 1)):
+                if self.current_level_matrix[current_x][j] is None:
+                    empty_cell_found = True
+                else:
+                    x2, y2 = self.cards[(current_x, j)]
+                    if (x2, y2) not in chosen_cards and (current_x, j) not in chosen_cards\
+                            and self.is_recycler_move_legal(min(current_x, x2), min(j, y2), max(current_x, x2), max(j, y2)) is True:
+                        row_card_pick_possible = True
+                        chosen_cards.append((min(current_x, x2), min(j, y2)))
+            if row_card_pick_possible is False and empty_cell_found is False:
+                return chosen_cards
+            current_x -= 1
+        return chosen_cards
+
+    def get_card(self, rotations, position):
+        x1, y1 = position
+        x2, y2 = self.cards[position]
+        first_cell = self.get_cell_info(x1, y1)
+        second_cell = self.get_cell_info(x2, y2)
+        cells = [first_cell, second_cell]
+        card = Card(rotations[get_orientation(cells) - 1],  y1, x1)
+        return card
+
+    def get_cell_info(self,x,y):
+        return self.current_level_matrix[x][y]
+
+    def remove_card(self, first_cell, second_cell):
+        x1, y1 = first_cell
+        x2, y2 = second_cell
+        self.current_level_matrix[x1][y1] = None
+        self.current_level_matrix[x2][y2] = None
+        del self.cards[(x1, y1)]
+        del self.cards[(x2, y2)]
+
     def is_move_legal(self, x1, y1, x2, y2):
         if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:
             return False
@@ -110,3 +164,18 @@ class State:
         if x1 > 0 and (self.current_level_matrix[x1-1][y1] is None or (y1 != y2 and self.current_level_matrix[x1-1][y2] is None)):
             return False
         return True
+
+    def is_recycler_move_legal(self, x1, y1, x2, y2):
+        last_card_x1 = self.last_card_placed.get_first_cell().get_x_coordinate()
+        last_card_y1 = self.last_card_placed.get_first_cell().get_y_coordinate()
+        last_card_x2 = self.last_card_placed.get_second_cell().get_x_coordinate()
+        last_card_y2 = self.last_card_placed.get_second_cell().get_y_coordinate()
+        if self.cards.get((x1, y1)) == None or self.cards.get((x2, y2)) == None \
+                or self.cards[(x1, y1)] != (x2, y2) or self.cards[(x2, y2)] != (x1, y1):
+            return False
+        if (x1 == x2 and (self.get_cell_info(x1 + 1, y1) != None or self.get_cell_info(x1 + 1, y2) != None)) \
+                or self.get_cell_info(x2 + 1, y1) != None:
+            return False
+        if last_card_x1 != x1 or last_card_y1 != y1 or last_card_x2 != x2 or last_card_y2 != y2:
+            return True
+        return False
