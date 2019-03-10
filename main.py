@@ -272,8 +272,11 @@ if playMode == 1:
         print('\nCards placement count on Board: ' + str(board.get_placed_cards_count()))
 
     if board.is_winner_found is True:
-        print(str(board.get_current_player().get_player_name()) + " with play choice " + str(
-            board.get_current_player().get_play_choice()) + " won the game ")
+        win_player = 0
+        if board.winner == players[1].get_play_choice():
+            win_player = 1
+        print("\n" + str(players[win_player].get_player_name()) + " with play choice " + str(
+            players[win_player].get_play_choice()) + " won the game ")
     else:
         print('Game draw!')
 
@@ -318,8 +321,10 @@ if playMode == 2:
         print('\nCards placement count on Board: ' + str(board.get_placed_cards_count()))
 
     if board.is_winner_found is True:
-        print("\n" + str(board.get_current_player().get_player_name()) + " with play choice " + str(
-            board.get_current_player().get_play_choice()) + " won the game ")
+        win_player = 0
+        if board.winner == players[1].get_play_choice():
+            win_player = 1
+        print("\n" + str(players[win_player].get_player_name()) + " with play choice " + str(players[win_player].get_play_choice()) + " won the game ")
     else:
         print('Game draw!')
 

@@ -18,6 +18,7 @@ class Board:
         self.red_circle = []
         self.white_dot = []
         self.red_dot = []
+        self.winner = None
 
     def place_card(self, card):
         x1 = card.get_first_cell().get_x_coordinate()
@@ -34,8 +35,18 @@ class Board:
             self.add_coordinates_to_specific_list(card.get_second_cell(),(x2, y2))
             self.cards[(x1, y1)] = (x2, y2)
             self.cards[(x2, y2)] = (x1, y1)
+
             self.is_winner_found = self.check_win(x1, y1, self.current_player.get_play_choice()) or \
-                self.check_win(x2, y2, self.current_player.get_play_choice())
+                                   self.check_win(x2, y2, self.current_player.get_play_choice())
+            if self.is_winner_found:
+                self.winner = self.current_player.get_play_choice()
+            else:
+                opponent_choice = 'COLOR' if self.current_player.get_play_choice() == 'DOTS' else 'COLOR'
+                self.is_winner_found = self.check_win(x1, y1, opponent_choice) or \
+                                       self.check_win(x2, y2, opponent_choice)
+                if self.is_winner_found:
+                    self.winner = opponent_choice
+
             return True
         else:
             print('Invalid Move! Please input a valid move')
