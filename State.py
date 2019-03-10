@@ -6,11 +6,13 @@ from utils import get_orientation
 
 class State:
 
-    def __init__(self, current_level_state, new_card=None):
+    def __init__(self, current_level_state, new_card=None, pick_card=None):
         self.placed_cards_count = current_level_state.placed_cards_count
         self.last_card_placed = current_level_state.last_card_placed
         self.cards = current_level_state.cards.copy()
         if new_card is not None:
+            if pick_card is not None:
+                self.pick_card = pick_card
             self.current_level_matrix = current_level_state.current_level_matrix.copy()
             self.white_circle_coordinates = current_level_state.white_circle_coordinates.copy()
             self.red_circle_coordinates = current_level_state.red_circle_coordinates.copy()
@@ -155,6 +157,7 @@ class State:
         self.current_level_matrix[x2][y2] = None
         del self.cards[(x1, y1)]
         del self.cards[(x2, y2)]
+
 
     def is_move_legal(self, x1, y1, x2, y2):
         if x1 < 0 or x2 >= 12 or y1 < 0 or y2 >= 8:

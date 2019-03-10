@@ -27,6 +27,9 @@ ROTATIONS = [[DIRECTION[0], DOT[0], COLOR[0], DOT[1], COLOR[1]],
              [DIRECTION[0], DOT[0], COLOR[1], DOT[1], COLOR[0]],
              [DIRECTION[1], DOT[1], COLOR[0], DOT[0], COLOR[1]]]
 
+MAX_REGULAR_MOVES_COUNT = 5
+MAX_PLACED_CARDS_COUNT = 60
+
 print('\n\t\t:::: Double Board Game ::::')
 NUM_PLAYERS = 2
 
@@ -121,7 +124,7 @@ def generate_states_from_position(parent_state_node, position_moves, recycler_pa
         for i in range(4):
             card = Card(ROTATIONS[(2 * i) if x1 == x2 else (2 * i + 1)], y1, x1)
             if pick_card is None or (pick_card is not None and is_valid_place_card_move(pick_card, card)):
-                state = State(current_state, card)
+                state = State(current_state, card, pick_card)
                 state_node = StateNode(state)
                 state_node.parent = parent_state_node if recycler_parent_node is None else recycler_parent_node
                 move_state_nodes.append(state_node)
@@ -142,8 +145,13 @@ def get_children_states(current_state_node, recycler_parent_node=None, pick_card
 def perform_ai_regular_move(current_state, board, ai_choice, is_active, is_trace):
     root_state_node = StateNode(current_state)
     root_state_node.children = get_children_states(root_state_node)
-    for child_state_node in root_state_node.children:
-        child_state_node.children = get_children_states(child_state_node)
+
+    if root_state_node.data.placed_cards_count < MAX_REGULAR_MOVES_COUNT - 1:
+        for child_state_node in root_state_node.children:
+            child_state_node.children = get_children_states(child_state_node)
+    else:
+        for child_state_node in root_state_node.children:
+            child_state_node.children = get_recycler_move_children_states(child_state_node)
 
     if is_active:
         algo = AlphaBeta(root_state_node, ai_choice)
@@ -182,7 +190,9 @@ def perform_ai_recycling_move(current_state, board):
 
     algo = MiniMax(root_state_node, ai_choice)
     decision_state_node = algo.minimax_algorithm()
-    board.place_card(decision_state_node.data.card)
+    algo.write_nodes_data_to_trace_file()
+    picked_card = decision_state_node.data.pick_card
+    board.move_card(picked_card.rotation, picked_card.first_cell, picked_card.second_cell, decision_state_node.data.card)
 
 
 dt = np.dtype('U10')
@@ -225,19 +235,21 @@ if playMode == 1:
     headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
     print_board(board)
 
-    while board.get_placed_cards_count() < 24 and board.is_winner_found is False:
+    while board.get_placed_cards_count() < MAX_REGULAR_MOVES_COUNT and board.is_winner_found is False:
         current_player = next_player()
         print('\nPlayer {0}, Your turn now...'.format(str(current_player + 1)))
         board.set_current_player(players[current_player])
         perform_player_regular_move(board)
         print_board(board)
+        print('\n# Cards placed on Board: ' + str(board.get_placed_cards_count()))
 
-    while board.is_winner_found is False and board.get_placed_cards_count() < 60:
+    while board.is_winner_found is False and board.get_placed_cards_count() < MAX_PLACED_CARDS_COUNT:
         current_player = next_player()
         print('\nPlayer {0}, Your turn now for the recycling move...'.format(str(current_player + 1)))
         board.set_current_player(players[current_player])
         perform_player_recycling_move(board)
         print_board(board)
+        print('\nCards placement count on Board: ' + str(board.get_placed_cards_count()))
 
     if board.is_winner_found is True:
         print(str(board.get_current_player().get_player_name()) + " with play choice " + str(
@@ -260,7 +272,7 @@ if playMode == 2:
     headers = [str(chr(64 + i + 1)) for i in range(np.size(board.matrix_data, 1))]
     print_board(board)
 
-    while board.get_placed_cards_count() < 8 and board.is_winner_found is False:
+    while board.get_placed_cards_count() < MAX_REGULAR_MOVES_COUNT and board.is_winner_found is False:
         current_player = players[next_player()]
         print('\n{0}, Your turn now...'.format(str(current_player.get_player_name())))
         board.set_current_player(current_player)
@@ -270,6 +282,23 @@ if playMode == 2:
         else:
             perform_player_regular_move(board)
         print_board(board)
+        print('\n# Cards placed on Board: ' + str(board.get_placed_cards_count()))
 
-    current_state = State(board)
-    perform_ai_recycling_move(current_state, board)
+    while board.is_winner_found is False and board.get_placed_cards_count() < MAX_PLACED_CARDS_COUNT:
+        current_player = players[next_player()]
+        print('\n{0}, Your turn now for the recycling move...'.format(str(current_player.get_player_name())))
+        board.set_current_player(current_player)
+        if current_player.get_player_name() == 'AI':
+            current_state = State(board)
+            perform_ai_recycling_move(current_state, board)
+        else:
+            perform_player_recycling_move(board)
+        print_board(board)
+        print('\nCards placement count on Board: ' + str(board.get_placed_cards_count()))
+
+    if board.is_winner_found is True:
+        print(str(board.get_current_player().get_player_name()) + " with play choice " + str(
+            board.get_current_player().get_play_choice()) + " won the game ")
+    else:
+        print('Game draw!')
+
