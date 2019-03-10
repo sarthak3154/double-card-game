@@ -15,8 +15,7 @@ class MiniMax:
             state_node.heuristic_value = state_node.get_data().get_heuristic_value()
             return state_node.heuristic_value
 
-        children = state_node.children
-        for child in children:
+        for child in state_node.children:
             child.heuristic_value = self.minimize(child)
             maximum_heuristic_value = max(child.heuristic_value,maximum_heuristic_value)
         return maximum_heuristic_value
@@ -27,19 +26,18 @@ class MiniMax:
             self.count = self.count + 1
             state_node.heuristic_value = state_node.get_data().get_heuristic_value()
             return state_node.heuristic_value
-        children = state_node.children
-        for child in children:
+
+        for child in state_node.children:
             child.heuristic_value = self.maximize(child)
             minimum_heuristic_value = min(child.heuristic_value, minimum_heuristic_value)
         return minimum_heuristic_value
 
     def minimax_algorithm(self):
-        if self.type is "COLOR":
+        if self.type == "COLOR":
             decision_value = self.maximize(self.root_state_node)
         else:
             decision_value = self.minimize(self.root_state_node)
         self.root_state_node.heuristic_value = decision_value
-        print(decision_value)
         children = self.root_state_node.children
         decision_state = [child for child in children if child.heuristic_value == decision_value]
         return decision_state[0]

@@ -46,7 +46,7 @@ class AlphaBeta:
         if depth is 0:
             return self.root_state_node
 
-        if self.type is "COLOR":
+        if self.type == 'COLOR':
             decision_value = -math.inf
             for child in self.root_state_node.children:
                 child.heuristic_value = self.minimize(child, depth-1, a, b)
@@ -66,48 +66,6 @@ class AlphaBeta:
 
         self.root_state_node.heuristic_value = decision_value
         return decision_state
-
-    def ab(self):
-        a = -math.inf
-        b = math.inf
-
-        children = self.root_state_node.children
-        if self.type is "COLOR":
-            decision_value = self.alpha_beta(self.root_state_node, 3, -math.inf, math.inf, True)
-        else:
-            decision_value = self.alpha_beta(self.root_state_node, 3, -math.inf, math.inf, False)
-
-        decision_state = [child for child in children if child.heuristic_value == decision_value]
-        return decision_state[0]
-
-    def alpha_beta(self, state_node, depth, a, b, choice):
-
-        if depth is 0 or (state_node is not None and len(state_node.children)) == 0:
-            self.count = self.count + 1
-            state_node.heuristic_value = state_node.get_data().get_heuristic_value()
-            return state_node.heuristic_value
-
-        children = self.root_state_node.children
-
-        if choice:
-            decision_value = -math.inf
-            for child in children:
-                decision_value = max(decision_value, self.alpha_beta(child, depth - 1, a, b, False))
-                child.heuristic_value = decision_value
-                a = max(a,decision_value)
-                if b <= a:
-                    break
-            return decision_value
-
-        else:
-            decision_value = math.inf
-            for child in children:
-                decision_value = min(decision_value, self.alpha_beta(child, depth - 1, a, b, True))
-                child.heuristic_value = decision_value
-                b = min(b, decision_value)
-                if b <= a:
-                    break
-            return decision_value
 
     def write_nodes_data_to_trace_file(self):
         f = open("tracemm.txt", "a+")

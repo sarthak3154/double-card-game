@@ -146,7 +146,7 @@ class Board:
             return False
 
         if (x1 == x2 and (self.get_cell_info(x1 + 1, y1) != None or self.get_cell_info(x1 + 1, y2) != None)) \
-                or self.get_cell_info(x2 + 1, y1) != None:
+                or (x2 < 11 and self.get_cell_info(x2 + 1, y1) != None):
             print('Illegal Move. Cannot pick this card. Pick any card from the top')
             return False
 

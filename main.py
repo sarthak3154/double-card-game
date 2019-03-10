@@ -27,7 +27,7 @@ ROTATIONS = [[DIRECTION[0], DOT[0], COLOR[0], DOT[1], COLOR[1]],
              [DIRECTION[0], DOT[0], COLOR[1], DOT[1], COLOR[0]],
              [DIRECTION[1], DOT[1], COLOR[0], DOT[0], COLOR[1]]]
 
-MAX_REGULAR_MOVES_COUNT = 5
+MAX_REGULAR_MOVES_COUNT = 24
 MAX_PLACED_CARDS_COUNT = 60
 
 print('\n\t\t:::: Double Board Game ::::')
@@ -45,33 +45,38 @@ def select_play_mode():
 
 def select_computer_turn():
     mode = input('\nWhich turn does AI will take (First or second) ?\nNote: use 1 and 2 for your input\n')
-    if len(mode) > 1 or (mode.isnumeric() and (int(mode) > 2 or int(mode) < 1)):
+    if mode not in ['1', '2']:
         print('Invalid Input! Choose 1 or 2')
         return select_computer_turn()
 
     return int(mode)
 
 
-def alpha_beta_trace_input():
+def alpha_beta_input():
     active = input('\nDo you want to activate alpha-beta algorithm  ?\n 1. Yes  2. No \n')
-    if len(active) > 1 or (active.isnumeric() and (int(active) > 2 or int(active) < 1)):
+    if active not in ['1','2']:
         print('Invalid Input! Choose 1 or 2')
-        return alpha_beta_trace_input()
-
-    trace = input('\nDo you want to generate trace file ?\n 1. Yes  2. No \n')
-    if len(trace) > 1 or (trace.isnumeric() and (int(trace) > 2 or int(trace) < 1)):
-        print('Invalid Input! Choose 1 or 2')
-        return alpha_beta_trace_input()
+        return alpha_beta_input()
 
     is_active = True if int(active) is 1 else False
-    is_trace = True if int(trace) is 1 else False
+    return is_active
 
-    return is_active, is_trace
+def trace_input():
+    trace = input('\nDo you want to generate trace file ?\n 1. Yes  2. No \n')
+    if trace not in ['1', '2']:
+        print('Invalid Input! Choose 1 or 2')
+        return trace_input()
+
+    is_trace = True if int(trace) is 1 else False
+    return is_trace
 
 
 def assign_player_choices(play_mode='human'):
     choice = input('\nPlayer 1, what do you want to play with? (dots or color): \n')
     choice = choice.upper()
+    if choice not in ['COLOR','DOTS']:
+        print("Invalid input. Please enter dots or color as your choice.")
+        return assign_player_choices(play_mode)
     players = [None for i in range(NUM_PLAYERS)]
     players[0] = Player(choice,'AI' if play_mode is 'ai' else 'Human')
     players[1] = Player('COLOR' if choice == 'DOTS' else 'DOTS', 'Human' if play_mode is'ai' else 'AI')
@@ -81,6 +86,9 @@ def assign_player_choices(play_mode='human'):
 def perform_player_regular_move(board):
     move = input('Play your move: \n')
     moveInfo = move.split(' ')
+    if len(moveInfo) is not 4:
+        print('Invalid Input. Please enter valid input of regular move')
+        return perform_player_regular_move(board)
     card = Card(ROTATIONS[int(moveInfo[1]) - 1], get_col_coordinate(moveInfo[2]), get_row_coordinate(moveInfo[3]))
     move_success = board.place_card(card)
     if move_success is False:
@@ -91,6 +99,10 @@ def perform_player_regular_move(board):
 def perform_player_recycling_move(board):
     move = input('Play your move: \n')
     moveInfo = move.split(' ')
+    if len(moveInfo) is not 7:
+        print('Invalid Input. Please enter valid input of recycling move')
+        return perform_player_recycling_move(board)
+
     first_cell = board.get_cell_info(get_row_coordinate(moveInfo[1]), get_col_coordinate(moveInfo[0]))
     second_cell = board.get_cell_info(get_row_coordinate(moveInfo[3]), get_col_coordinate(moveInfo[2]))
     cells = [first_cell, second_cell]
@@ -181,16 +193,24 @@ def get_recycler_move_children_states(current_state_node):
     return children_state_nodes
 
 
-def perform_ai_recycling_move(current_state, board):
+def perform_ai_recycling_move(current_state, board, ai_choice, is_active, is_trace):
     root_state_node = StateNode(current_state)
     root_state_node.children = get_recycler_move_children_states(root_state_node)
 
     for child_state_node in root_state_node.children:
         child_state_node.children = get_recycler_move_children_states(child_state_node)
 
-    algo = MiniMax(root_state_node, ai_choice)
-    decision_state_node = algo.minimax_algorithm()
-    algo.write_nodes_data_to_trace_file()
+    if is_active:
+        algo = AlphaBeta(root_state_node, ai_choice)
+        decision_state_node = algo.alpha_beta_algorithm(2)
+
+    else:
+        algo = MiniMax(root_state_node, ai_choice)
+        decision_state_node = algo.minimax_algorithm()
+
+    if is_trace:
+        algo.write_nodes_data_to_trace_file()
+
     picked_card = decision_state_node.data.pick_card
     board.move_card(picked_card.rotation, picked_card.first_cell, picked_card.second_cell, decision_state_node.data.card)
 
@@ -259,7 +279,8 @@ if playMode == 1:
 
 if playMode == 2:
     print('\nYou have chosen to play with Computer!')
-    (is_active, is_trace) = alpha_beta_trace_input()
+    is_active = alpha_beta_input()
+    is_trace = trace_input()
     turn = select_computer_turn()
     if turn is 1:
         players = assign_player_choices('ai')
@@ -290,14 +311,14 @@ if playMode == 2:
         board.set_current_player(current_player)
         if current_player.get_player_name() == 'AI':
             current_state = State(board)
-            perform_ai_recycling_move(current_state, board)
+            perform_ai_recycling_move(current_state, board,ai_choice, is_active, is_trace)
         else:
             perform_player_recycling_move(board)
         print_board(board)
         print('\nCards placement count on Board: ' + str(board.get_placed_cards_count()))
 
     if board.is_winner_found is True:
-        print(str(board.get_current_player().get_player_name()) + " with play choice " + str(
+        print("\n" + str(board.get_current_player().get_player_name()) + " with play choice " + str(
             board.get_current_player().get_play_choice()) + " won the game ")
     else:
         print('Game draw!')

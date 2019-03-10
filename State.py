@@ -107,7 +107,7 @@ class State:
         rows = np.unique(rows)
         max_fillable_row = self.get_max_fillable_row()
         available_positions = []
-        for i in range(max_fillable_row):
+        for i in range(12 if max_fillable_row is -1 else max_fillable_row):
             if i in rows:
                 empty_row_elements = self.get_valid_empty_positions_in_row(i)
                 available_positions = available_positions + empty_row_elements
@@ -177,7 +177,7 @@ class State:
                 or self.cards[(x1, y1)] != (x2, y2) or self.cards[(x2, y2)] != (x1, y1):
             return False
         if (x1 == x2 and (self.get_cell_info(x1 + 1, y1) != None or self.get_cell_info(x1 + 1, y2) != None)) \
-                or self.get_cell_info(x2 + 1, y1) != None:
+                or (x2 < 11 and self.get_cell_info(x2 + 1, y1) != None):
             return False
         if last_card_x1 != x1 or last_card_y1 != y1 or last_card_x2 != x2 or last_card_y2 != y2:
             return True
