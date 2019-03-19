@@ -12,7 +12,7 @@ class MiniMax:
         maximum_heuristic_value = -math.inf
         if state_node is not None and len(state_node.children) == 0:
             self.count = self.count + 1
-            state_node.heuristic_value = state_node.get_data().get_heuristic_value()
+            state_node.heuristic_value = state_node.get_data().get_first_informed_heuristic_value(type)
             return state_node.heuristic_value
 
         for child in state_node.children:
@@ -24,7 +24,7 @@ class MiniMax:
         minimum_heuristic_value = math.inf
         if state_node is not None and len(state_node.children) == 0:
             self.count = self.count + 1
-            state_node.heuristic_value = state_node.get_data().get_heuristic_value()
+            state_node.heuristic_value = state_node.get_data().get_first_informed_heuristic_value(type)
             return state_node.heuristic_value
 
         for child in state_node.children:

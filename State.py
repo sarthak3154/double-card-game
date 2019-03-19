@@ -76,6 +76,37 @@ class State:
 
         return round(white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value) , 2)
 
+    def find_variable_count(self, start, end, x, y, type, direction, step = 1):
+        var_count = 0
+        for i in range(start, end, step):
+            x = x + i if direction == 1 or direction == 2 else x
+            y = y + i if direction == 0 or direction == 2 else y
+            y = y + i if direction == 3 and step == 1 else y - i
+            x = x - i if direction == 3 and step == 1 else x + i
+
+            if self.current_level_matrix[x][y] is not None:
+                if self.current_level_matrix[x][y].get_dot_type() == type:
+                    var_count += 1
+                else:
+                    break
+        return var_count
+
+    def get_first_informed_heuristic_value(self,type):
+        first_cell = self.last_card_placed.get_first_cell()
+        x = first_cell.get_x_coordinate()
+        y = first_cell.get_y_coordinate()
+        horizontal_count = 0
+        vertical_count = 0
+        diagonal_right_count = 0
+        diagonal_left_count = 0
+        if type == 'DOTS':
+            horizontal_count = self.find_variable_count(1, 4, x, y, type, 0) + self.find_variable_count(-1, -4, x, y, type, 0, -1)
+            vertical_count = self.find_variable_count(1, 4, x, y, type, 1) + self.find_variable_count(-1, -4, x, y, type, 1, -1)
+            diagonal_right_count = self.find_variable_count(1, 4, x, y, type, 2) + self.find_variable_count(-1, -4, x, y, type, 2, -1)
+            diagonal_left_count = self.find_variable_count(1, 4, x, y, type, 3) + self.find_variable_count(-1, -4, x, y, type, 3, -1)
+
+        return horizontal_count + vertical_count + diagonal_right_count + diagonal_left_count
+
     def generate_init_position_moves(self, position_tuple):
         # print(position_tuple)
         x1, y1 = position_tuple

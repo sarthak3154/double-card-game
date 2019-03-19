@@ -4,8 +4,6 @@ from Cell import *
 
 class Board:
 
-
-
     def __init__(self, players):
         self.matrix_data = np.empty((12, 8), dtype=object)
         self.players = players
