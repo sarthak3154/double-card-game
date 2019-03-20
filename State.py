@@ -76,34 +76,116 @@ class State:
 
         return round(white_circle_value + (3*white_dot_value) - (2*red_dot_value) - (1.5*red_circle_value) , 2)
 
-    def find_variable_count(self, start, end, x, y, type, direction, step = 1):
+    def find_color_count(self, start, end, x, y, color_type, direction, step = 1):
         var_count = 0
+
         for i in range(start, end, step):
             x = x + i if direction == 1 or direction == 2 else x
             y = y + i if direction == 0 or direction == 2 else y
-            y = y + i if direction == 3 and step == 1 else y - i
-            x = x - i if direction == 3 and step == 1 else x + i
+            if direction == 3 and step == 1:
+                y = y + i
+                x = x - i
+            elif direction == 3 and step == -1:
+                x = x + i
+                y = y - i
 
-            if self.current_level_matrix[x][y] is not None:
-                if self.current_level_matrix[x][y].get_dot_type() == type:
-                    var_count += 1
-                else:
-                    break
+            if 0 <= x < 12 and 8 > y >= 0:
+                if self.current_level_matrix[x][y] is not None:
+                    if self.current_level_matrix[x][y].get_color_type() == color_type:
+                        var_count += 1
+                    else:
+                        break
+
+        if var_count == 3:
+            var_count += 20000
+        elif var_count == 2:
+            var_count += 100
+        elif var_count == 1:
+            var_count += 10
+
+        return var_count
+
+    def find_dot_count(self, start, end, x, y, dot_type, direction, step = 1):
+        var_count = 0
+
+        for i in range(start, end, step):
+            x = x + i if direction == 1 or direction == 2 else x
+            y = y + i if direction == 0 or direction == 2 else y
+            if direction == 3 and step == 1:
+                y = y + i
+                x = x - i
+            elif direction == 3 and step == -1:
+                x = x + i
+                y = y - i
+
+            if 0 <= x < 12 and 8 > y >= 0:
+                if self.current_level_matrix[x][y] is not None:
+                    if self.current_level_matrix[x][y].get_dot_type() == dot_type:
+                        var_count -= 1
+                    else:
+                        break
+
+        if var_count == 3:
+            var_count -= 20000
+        elif var_count == 2:
+            var_count -= 100
+        elif var_count == 1:
+            var_count -= 10
+
         return var_count
 
     def get_first_informed_heuristic_value(self,type):
         first_cell = self.last_card_placed.get_first_cell()
-        x = first_cell.get_x_coordinate()
-        y = first_cell.get_y_coordinate()
+        second_cell = self.last_card_placed.get_second_cell()
+        x1 = first_cell.get_x_coordinate()
+        y1 = first_cell.get_y_coordinate()
+        x2 = second_cell.get_x_coordinate()
+        y2 = second_cell.get_y_coordinate()
+
         horizontal_count = 0
         vertical_count = 0
         diagonal_right_count = 0
         diagonal_left_count = 0
-        if type == 'DOTS':
-            horizontal_count = self.find_variable_count(1, 4, x, y, type, 0) + self.find_variable_count(-1, -4, x, y, type, 0, -1)
-            vertical_count = self.find_variable_count(1, 4, x, y, type, 1) + self.find_variable_count(-1, -4, x, y, type, 1, -1)
-            diagonal_right_count = self.find_variable_count(1, 4, x, y, type, 2) + self.find_variable_count(-1, -4, x, y, type, 2, -1)
-            diagonal_left_count = self.find_variable_count(1, 4, x, y, type, 3) + self.find_variable_count(-1, -4, x, y, type, 3, -1)
+        if type == 'COLOR':
+            color_type_1 = self.current_level_matrix[x1][y1].get_color_type()
+            color_type_2 = self.current_level_matrix[x2][y2].get_color_type()
+            dot_type_1 = self.current_level_matrix[x1][y1].get_dot_type()
+            dot_type_2 = self.current_level_matrix[x2][y2].get_dot_type()
+            horizontal_count = self.find_color_count(1, 4, x1, y1, color_type_1, 0) + \
+                               self.find_color_count(-1, -4, x1, y1, color_type_1, 0, -1) + \
+                               self.find_color_count(1, 4, x2, y2, color_type_2, 0) + \
+                               self.find_color_count(-1, -4, x2, y2, color_type_2, 0, -1) + \
+                               self.find_dot_count(1, 4, x1, y1, dot_type_1, 0) + \
+                               self.find_dot_count(-1, -4, x1, y1, dot_type_1, 0, -1) + \
+                               self.find_dot_count(1, 4, x2, y2, dot_type_2, 0) + \
+                               self.find_dot_count(-1, -4, x2, y2, dot_type_2, 0, -1)
+
+            vertical_count = self.find_color_count(1, 4, x1, y1, color_type_1, 1) + \
+                             self.find_color_count(-1, -4, x1, y1, color_type_1, 1, -1) + \
+                             self.find_color_count(1, 4, x2, y2, color_type_2, 1) + \
+                             self.find_color_count(-1, -4, x2, y2, color_type_2, 1, -1) + \
+                             self.find_dot_count(1, 4, x1, y1, dot_type_1, 1) + \
+                             self.find_dot_count(-1, -4, x1, y1, dot_type_1, 1, -1) + \
+                             self.find_dot_count(1, 4, x2, y2, dot_type_2, 1) + \
+                             self.find_dot_count(-1, -4, x2, y2, dot_type_2, 1, -1)
+
+            diagonal_right_count = self.find_color_count(1, 4, x1, y1, color_type_1, 2) + \
+                                   self.find_color_count(-1, -4, x1, y1, color_type_1, 2, -1) + \
+                                   self.find_color_count(1, 4, x2, y2, color_type_2, 2) + \
+                                   self.find_color_count(-1, -4, x2, y2, color_type_2, 2, -1) + \
+                                   self.find_dot_count(1, 4, x1, y1, dot_type_1, 2) + \
+                                   self.find_dot_count(-1, -4, x1, y1, dot_type_1, 2, -1) + \
+                                   self.find_dot_count(1, 4, x2, y2, dot_type_2, 2) + \
+                                   self.find_dot_count(-1, -4, x2, y2, dot_type_2, 2, -1)
+
+            diagonal_left_count = self.find_color_count(1, 4, x1, y1, color_type_1, 3) + \
+                                  self.find_color_count(-1, -4, x1, y1, color_type_1, 3, -1) + \
+                                  self.find_color_count(1, 4, x2, y2, color_type_2, 3) + \
+                                  self.find_color_count(-1, -4, x2, y2, color_type_2, 3, -1) + \
+                                  self.find_dot_count(1, 4, x1, y1, dot_type_1, 3) + \
+                                  self.find_dot_count(-1, -4, x1, y1, dot_type_1, 3, -1) + \
+                                  self.find_dot_count(1, 4, x2, y2, dot_type_2, 3) + \
+                                  self.find_dot_count(-1, -4, x2, y2, dot_type_2, 3, -1)
 
         return horizontal_count + vertical_count + diagonal_right_count + diagonal_left_count
 
