@@ -147,10 +147,10 @@ class State:
         opponent_type = 'DOTS' if type == 'COLOR' else 'COLOR'
         if self.check_win(parent_first_cell.x, parent_first_cell.y, type) or \
                 self.check_win(parent_second_cell.x, parent_second_cell.y, type):
-            return 3000
+            return 3000 if type == 'COLOR' else -3000
         if self.check_win(parent_first_cell.x, parent_first_cell.y, opponent_type) or \
                 self.check_win(parent_second_cell.x, parent_second_cell.y, opponent_type):
-            return -3000
+            return -3000 if type == 'COLOR' else 3000
 
         color_type_1 = self.current_level_matrix[x1][y1].get_color_type()
         color_type_2 = self.current_level_matrix[x2][y2].get_color_type()

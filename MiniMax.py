@@ -13,7 +13,7 @@ class MiniMax:
         if state_node is not None and len(state_node.children) == 0:
             self.count = self.count + 1
             state_node.heuristic_value = state_node.get_data().get_first_informed_heuristic_value(state_node.parent.data.last_card_placed, self.type)
-            print('x1: ' + str(state_node.data.last_card_placed.first_cell.x) + ' y1: ' + str(state_node.data.last_card_placed.first_cell.y) + ' x2: ' + str(state_node.data.last_card_placed.second_cell.x) + ' y2: ' + str(state_node.data.last_card_placed.second_cell.y) + ' | ' + str(state_node.heuristic_value))
+            # print('x1: ' + str(state_node.data.last_card_placed.first_cell.x) + ' y1: ' + str(state_node.data.last_card_placed.first_cell.y) + ' x2: ' + str(state_node.data.last_card_placed.second_cell.x) + ' y2: ' + str(state_node.data.last_card_placed.second_cell.y) + ' | ' + str(state_node.heuristic_value))
             return state_node.heuristic_value
 
         for child in state_node.children:
@@ -26,7 +26,7 @@ class MiniMax:
         if state_node is not None and len(state_node.children) == 0:
             self.count = self.count + 1
             state_node.heuristic_value = state_node.get_data().get_first_informed_heuristic_value(state_node.parent.data.last_card_placed, self.type)
-            print(state_node.heuristic_value)
+            # print(state_node.heuristic_value)
             return state_node.heuristic_value
 
         for child in state_node.children:
@@ -40,7 +40,7 @@ class MiniMax:
         else:
             decision_value = self.minimize(self.root_state_node)
         self.root_state_node.heuristic_value = decision_value
-        print("Decision value: " + str(decision_value))
+        # print("Decision value: " + str(decision_value))
         children = self.root_state_node.children
         decision_state = [child for child in children if child.heuristic_value == decision_value]
         return decision_state[0]
